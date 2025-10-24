@@ -9,13 +9,13 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <x-alert />
 </head>
 
 <body class="font-sans antialiased bg-sky-50">
     <div class="flex h-screen">
-
-        <x-sidebar />
         <div id="overlay" class="fixed inset-0 z-40 hidden bg-black bg-opacity-50 lg:hidden"></div>
+        <x-sidebar />
 
         <main class="flex flex-1 flex-col min-w-0">
             <x-header />

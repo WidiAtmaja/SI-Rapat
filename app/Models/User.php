@@ -45,4 +45,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function absensis()
+    {
+        return $this->hasMany(Absensi::class);
+    }
+
+    // Relasi ke Rapat (sebagai PIC)
+    public function rapatsAsPic()
+    {
+        return $this->hasMany(Rapat::class, 'pic_id');
+    }
 }
