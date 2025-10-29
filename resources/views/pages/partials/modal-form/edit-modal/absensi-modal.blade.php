@@ -31,7 +31,8 @@
                         <path d="M11 15H13V17H11z"></path>
                         <path d="M15 15H17V17H15z"></path>
                     </svg>
-                    <span class="text-gray-600 mx-2">{{ $absen->rapat->tanggal }}</span>
+                    <span class="text-gray-600 mx-2">
+                        {{ \Carbon\Carbon::parse($absen->rapat->tanggal)->format('d M Y') }}</span>
                 </div>
                 <div class="flex items-center text-sm my-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#323232"
@@ -42,8 +43,9 @@
                         <path d="M13 6h-2v6c0 .18.05.35.13.5l3 5.2 1.73-1-2.87-4.96V6.01Z">
                         </path>
                     </svg>
-                    <span class="text-gray-600 mx-2">{{ $absen->rapat->waktu_mulai }} -
-                        {{ $absen->rapat->waktu_selesai }}</span>
+                    <span class="text-gray-600 mx-2">
+                        {{ \Carbon\Carbon::parse($absen->rapat->waktu_mulai)->translatedFormat('H.i') }} -
+                        {{ \Carbon\Carbon::parse($absen->rapat->waktu_selesai)->translatedFormat('H.i') }} WITA</span>
                 </div>
                 <div class="flex items-center text-sm my-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#323232"

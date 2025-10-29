@@ -15,7 +15,6 @@ class Absensi extends Model
         'kehadiran'
     ];
 
-    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -24,6 +23,6 @@ class Absensi extends Model
     // Relasi ke Rapat
     public function rapat()
     {
-        return $this->belongsTo(Rapat::class);
+        return $this->belongsTo(Rapat::class, 'rapat_id');
     }
 }

@@ -4,24 +4,18 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\NotulenController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapatController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/login');
-
-Route::get('/manajemen-pengguna', function () {
-    return view('pages.admin.manajemen-pengguna');
-});
-Route::get('/tabel-manajemen-absensi', function () {
-    return view('pages.admin.tabel-manajemen-absensi');
+Route::get('/', function () {
+    return Auth::check() ? redirect('/rapat') : redirect('/login');
 });
 
-Route::get('/notulensi-detail', function () {
-    return view('pages.partials.detail-notulensi');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/rapat', [RapatController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('rapat.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -29,33 +23,52 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::resource('rapat', RapatController::class);
-});
-
 Route::middleware(['auth'])->group(function () {
-
-    // Route untuk semua user (admin & pegawai)
-    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
 
     // Route khusus Admin
     Route::middleware(['admin'])->group(function () {
+
+        //  MANAJEMEN USER
+        Route::get('/manajemen-pengguna', [UserController::class, 'index'])->name('user.index');
+        Route::post('/manajemen-pengguna', [UserController::class, 'store'])->name('user.store');
+        Route::put('/manajemen-pengguna/{user}', [UserController::class, 'update'])->name('user.update');
+        Route::delete('/manajemen-pengguna/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+        Route::post('/manajemen-pengguna/import-excel', [UserController::class, 'importExcel'])->name('user.import-excel');
+
+        // Rapat
+        Route::post('/rapat', [RapatController::class, 'store'])->name('rapat.store');
+        // Route::get('/rapat/{rapat}/edit', [RapatController::class, 'edit'])->name('rapat.edit'); // <-- Tambah route edit
+        Route::put('/rapat/{rapat}', [RapatController::class, 'update'])->name('rapat.update'); // <-- {rapat}
+        Route::delete('/rapat/{rapat}', [RapatController::class, 'destroy'])->name('rapat.destroy'); // <-- {rapat}
+
+        // Absensi
         Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
-        Route::get('/absensi/{rapatId}', [AbsensiController::class, 'show'])->name('absensi.show');
-        Route::delete('/absensi/rapat/{rapatId}', [AbsensiController::class, 'destroy'])->name('absensi.destroy');
+        Route::get('/absensi/{rapat}', [AbsensiController::class, 'show'])->name('absensi.show'); // <-- {rapat}
+        Route::delete('/absensi/{rapat}', [AbsensiController::class, 'destroy'])->name('absensi.destroy'); // <-- {rapat}
+
+        // Notulensi
+        Route::get('/notulensi/create/{rapat}', [NotulenController::class, 'create'])->name('notulensi.create'); // <-- Tambah route create
         Route::post('/notulensi/store', [NotulenController::class, 'store'])->name('notulensi.store');
-        Route::delete('/notulensi/{id}', [NotulenController::class, 'destroy'])->name('notulensi.destroy');
-        Route::put('/notulensi/{id}', [NotulenController::class, 'update'])->name('notulensi.update');
+        // Route::get('/notulensi/{notulen}/edit', [NotulenController::class, 'edit'])->name('notulensi.edit'); // <-- Tambah route edit
+        Route::put('/notulensi/{notulen}', [NotulenController::class, 'update'])->name('notulensi.update'); // <-- {notulen}
+        Route::delete('/notulensi/{notulen}', [NotulenController::class, 'destroy'])->name('notulensi.destroy'); // <-- {notulen}
     });
 
-    // Route untuk Pegawai (update kehadiran mereka sendiri)
-    Route::put('/absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update');
+    // Rapat (Akses Umum)
+    Route::get('/rapat', [RapatController::class, 'index'])->name('rapat.index');
+    Route::get('/rapat/{rapat}', [RapatController::class, 'show'])->name('rapat.show'); // <-- {rapat}
 
+    // Search
+    Route::get('/search', [SearchController::class, 'search'])->name('global.search');
+
+    // Absensi (Akses Umum)
+    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index');
+    Route::put('/absensi/{absensi}', [AbsensiController::class, 'update'])->name('absensi.update'); // <-- {absensi} (ini sudah benar)
+
+    // Notulensi (Akses Umum)
     Route::get('/notulensi', [NotulenController::class, 'index'])->name('notulensi.index');
-    Route::get('/notulensi/{rapatId}', [NotulenController::class, 'show'])->name('notulensi.show');
-    Route::get('/rapat/{id}', [RapatController::class, 'show'])->name('rapat.show');
-    Route::get('/notulensi/download/{id}', [NotulenController::class, 'download'])->name('notulensi.download');
-    Route::resource('notulensi', App\Http\Controllers\NotulenController::class);
+    Route::get('/notulensi/{rapat}', [NotulenController::class, 'show'])->name('notulensi.show'); // <-- {rapat}
+    Route::get('/notulensi/download/{notulen}', [NotulenController::class, 'download'])->name('notulensi.download'); // <-- {notulen}
 });
 
 require __DIR__ . '/auth.php';

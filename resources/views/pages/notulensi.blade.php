@@ -5,25 +5,24 @@
                 <div class="flex p-7 justify-between items-center">
                     <h1 class="text-xl font-semibold">Notulensi</h1>
                     <div class="items-center flex">
-                        <div class="flex-1 px-6 max-w-sm mr-auto sm:ml-8">
-                            <form class="relative">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-4 h-4 text-gray-500" aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg>
-                                </div>
-                                <input type="search" id="default-search"
-                                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                                    placeholder="Cari..." />
-                            </form>
 
-                        </div>
                         @if (auth()->user()->peran === 'admin')
                             @include('pages.partials.modal-form.create-modal.notulensi-modal')
                         @endif
-                        <x-buttondropdown />
+
+                        {{-- Dropdown Filter Urutan (Terbaru/Terlama) --}}
+                        <form action="{{ route('notulensi.index') }}" method="GET" class="inline-block">
+                            <div class="relative inline-block pr-3">
+                                {{-- Filter ini akan mengirim parameter 'urutan' ke URL --}}
+                                <select name="urutan" onchange="this.form.submit()"
+                                    class="appearance-none w-auto max-w-44 pl-3 pr-8 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 cursor-pointer transition">
+                                    {{-- Default 'terbaru' (jika 'urutan' tidak ada di URL) --}}
+                                    <option value="terbaru" @selected(request('urutan') == 'terbaru' || !request('urutan'))>Terbaru</option>
+                                    <option value="terlama" @selected(request('urutan') == 'terlama')>Terlama</option>
+                                </select>
+                            </div>
+                        </form>
+
                     </div>
                 </div>
 
@@ -55,7 +54,8 @@
                                                 <path d="M11 15H13V17H11z"></path>
                                                 <path d="M15 15H17V17H15z"></path>
                                             </svg>
-                                            <span class="text-gray-600">{{ $item->rapat->tanggal ?? '-' }}</span>
+                                            <span
+                                                class="text-gray-600">{{ \Carbon\Carbon::parse($item->rapat->tanggal)->format('d M Y') }}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -66,8 +66,11 @@
                                                 <path d="M13 6h-2v6c0 .18.05.35.13.5l3 5.2 1.73-1-2.87-4.96V6.01Z">
                                                 </path>
                                             </svg>
-                                            <span class="ttext-gray-600">{{ $item->rapat->waktu_mulai ?? '-' }} -
-                                                {{ $item->rapat->waktu_selesai ?? '-' }}</span>
+                                            <span class="ttext-gray-600">
+                                                {{ \Carbon\Carbon::parse($item->rapat->waktu_mulai)->translatedFormat('H.i') }}
+                                                -
+                                                {{ \Carbon\Carbon::parse($item->rapat->waktu_selesai)->translatedFormat('H.i') }}
+                                                WITA</span>
                                         </div>
                                         <div class="flex items-center gap-1.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -91,7 +94,8 @@
 
                                         @if (auth()->user()->peran === 'admin')
                                             <form action="{{ route('notulensi.destroy', $item->id) }}" method="POST"
-                                                onsubmit="confirmDelete('this'); return false;">
+                                                onsubmit="confirmDelete(event, this)">
+
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -101,7 +105,6 @@
                                             </form>
                                             @include('pages.partials.modal-form.edit-modal.notulensi-modal')
                                         @endif
-
                                     </div>
 
                                 </div>
@@ -114,5 +117,4 @@
             </div>
         </div>
     </div>
-
 </x-app-layout>

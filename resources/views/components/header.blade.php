@@ -1,5 +1,5 @@
 <header class="flex items-center justify-between border-b bg-white px-4 py-3 shadow-sm">
-    {{-- Tombol Sidebar (kiri) --}}
+
     <div class="flex items-center gap-3">
         <button id="sidebarToggle" class="text-gray-600 lg:hidden">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -8,8 +8,8 @@
         </button>
     </div>
 
-    {{-- Form Pencarian (tengah agak ke kiri) --}}
-    <div class="flex-1 px-16 max-w-sm mr-auto sm:ml-8">
+    <div class="flex-1 px-16 max-w-sm mr-auto sm:ml-8 relative">
+
         <form class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -20,12 +20,14 @@
             </div>
             <input type="search" id="default-search"
                 class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Cari sesuatu..." />
+                placeholder="Cari sesuatu..." autocomplete="off" /> {{-- Tambahkan autocomplete="off" --}}
         </form>
+
+        <div id="search-results"
+            class="absolute z-50 w-[28rem] sm:w-[36rem] mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-96 overflow-y-auto hidden left-2/3 -translate-x-1/2">
+        </div>
     </div>
 
-
-    {{-- Profil User (kanan, Breeze bawaan) --}}
     <div class="ml-auto flex items-center">
         <x-dropdown align="right" width="32">
             <x-slot name="trigger">

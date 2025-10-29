@@ -50,35 +50,36 @@
                     {{-- Detail Grid --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">Tanggal Rapat</p>
-                            <p class="text-lg font-semibold">
+                            <p class="text-sm mb-2 text-gray-600">Tanggal Rapat</p>
+                            <p class="text-lg font-medium">
                                 {{ \Carbon\Carbon::parse($rapat->tanggal)->format('d M Y') }}</p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">Waktu Rapat</p>
-                            <p class="text-lg font-semibold">
-                                {{ $rapat->waktu_mulai ?? '-' }} - {{ $rapat->waktu_selesai ?? '-' }}
+                            <p class="text-sm mb-2 text-gray-600">Waktu Rapat</p>
+                            <p class="text-lg font-medium">
+                                {{ \Carbon\Carbon::parse($rapat->waktu_mulai)->translatedFormat('H.i') }} -
+                                {{ \Carbon\Carbon::parse($rapat->waktu_selesai)->translatedFormat('H.i') }} WITA
                             </p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">Lokasi Rapat</p>
-                            <p class="text-lg font-semibold">{{ $rapat->lokasi ?? '-' }}</p>
+                            <p class="text-sm mb-2 text-gray-600">Lokasi Rapat</p>
+                            <p class="text-lg font-medium">{{ $rapat->lokasi ?? '-' }}</p>
                         </div>
                     </div>
 
                     {{-- Tambahan Detail --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">Perangkat Daerah</p>
-                            <p class="text-lg font-semibold">{{ $rapat->nama_perangkat_daerah ?? '-' }}</p>
+                            <p class="text-sm mb-2 text-gray-600">Perangkat Daerah</p>
+                            <p class="text-lg font-medium">{{ $rapat->nama_perangkat_daerah ?? '-' }}</p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">PIC</p>
-                            <p class="text-lg font-semibold">{{ $rapat->pic->name ?? '-' }}</p>
+                            <p class="text-sm mb-2 text-gray-600">PIC</p>
+                            <p class="text-lg font-medium">{{ $rapat->pic->name ?? '-' }}</p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-600">Status</p>
-                            <p class="text-lg font-semibold capitalize">{{ $rapat->status ?? '-' }}</p>
+                            <p class="text-sm mb-2 text-gray-600">Status</p>
+                            <p class="text-lg font-medium capitalize">{{ $rapat->status ?? '-' }}</p>
                         </div>
                     </div>
                 </div>

@@ -50,8 +50,8 @@ window.showAlert = function() {
 };
 
 // Fungsi untuk konfirmasi delete
-window.confirmDelete = function(form) {
-    event.preventDefault();
+window.confirmDelete = function(event, form) { // <-- 1. Tambahkan 'event' di sini
+    event.preventDefault(); // <-- 2. 'event' sekarang sudah terdefinisi
     Swal.fire({
         title: 'Apakah Anda yakin?',
         text: "Data yang dihapus tidak dapat dikembalikan!",

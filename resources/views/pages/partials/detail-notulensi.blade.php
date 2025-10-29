@@ -39,28 +39,37 @@
                         </div>
 
                         @if ($notulen->lampiran_file)
-                            <a href="{{ route('notulensi.download', $notulen->id) }}"
-                                class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                            {{-- Tampilkan tombol jika file ada --}}
+                            <a href="{{ route('notulensi.download', $notulen->id) }}" target="_blank"
+                                class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                                 Unduh Notulensi
                             </a>
+                        @else
+                            {{-- Tampilkan div ini jika file TIDAK ada --}}
+                            <div
+                                class="text-gray-500 bg-gray-200 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                Tidak ada dokumen
+                            </div>
                         @endif
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Tanggal Rapat</p>
-                            <p class="text-lg font-semibold">{{ $notulen->rapat->tanggal ?? '-' }}</p>
+                            <p class="text-lg font-semibold">
+                                {{ \Carbon\Carbon::parse($notulen->rapat->tanggal)->format('d M Y') }}</p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Waktu Rapat</p>
                             <p class="text-lg font-semibold">
-                                {{ $notulen->rapat->waktu_mulai ?? '-' }} -
-                                {{ $notulen->rapat->waktu_selesai ?? '-' }}
+                                {{ \Carbon\Carbon::parse($notulen->rapat->waktu_mulai)->translatedFormat('H.i') }} -
+                                {{ \Carbon\Carbon::parse($notulen->rapat->waktu_selesai)->translatedFormat('H.i') }}
+                                WITA
                             </p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Lokasi Rapat</p>
-                            <p class="text-lg font-semibold">{{ $notulen->rapat->lokasi ?? '-' }}</p>
+                            <p class="text-lg font-semibold">{{ $notulen->rapat->lokasi }}</p>
                         </div>
                     </div>
                 </div>

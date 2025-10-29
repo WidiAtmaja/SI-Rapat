@@ -2,31 +2,36 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable; // Tambahkan HasFactory jika belum ada
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        // --- TAMBAHKAN FIELD KUSTOM ANDA DI SINI ---
+        'nip',
+        'unit_kerja',
+        'jabatan',
+        'peran',
+        'no_hp',
+        'jenis_kelamin',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -38,22 +43,25 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed', // Breeze modern menggunakan cast 'hashed'
+    ];
 
-    public function absensis()
-    {
-        return $this->hasMany(Absensi::class);
-    }
-
-    // Relasi ke Rapat (sebagai PIC)
+    /**
+     * Relasi: User (PIC) memiliki banyak Rapat.
+     * Ini digunakan di UserController@destroy untuk cek relasi.
+     */
     public function rapatsAsPic()
     {
         return $this->hasMany(Rapat::class, 'pic_id');
+    }
+
+    /**
+     * Relasi: User (Pegawai) memiliki banyak Absensi.
+     */
+    public function absensis()
+    {
+        return $this->hasMany(Absensi::class, 'user_id');
     }
 }

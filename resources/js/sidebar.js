@@ -1,5 +1,5 @@
 function initializeSidebar() {
-    const sidebar = document.querySelector('.sidebar'); // Asumsi sidebar punya class 'sidebar'
+    const sidebar = document.querySelector('.sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
     const overlay = document.getElementById('overlay');
 

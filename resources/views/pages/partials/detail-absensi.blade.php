@@ -47,13 +47,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Tanggal Rapat</p>
-                            <p class="text-lg font-semibold">{{ $rapat->tanggal }}</p>
+                            <p class="text-lg font-semibold">
+                                {{ \Carbon\Carbon::parse($rapat->tanggal)->format('d M Y') }}</p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Waktu Rapat</p>
                             <p class="text-lg font-semibold">
-                                {{ $rapat->waktu_mulai }} -
-                                {{ $rapat->waktu_selesai }}
+                                {{ \Carbon\Carbon::parse($rapat->waktu_mulai)->translatedFormat('H.i') }} -
+                                {{ \Carbon\Carbon::parse($rapat->waktu_selesai)->translatedFormat('H.i') }} WITA
                             </p>
                         </div>
                         <div class="bg-gray-50 p-4 rounded-lg">

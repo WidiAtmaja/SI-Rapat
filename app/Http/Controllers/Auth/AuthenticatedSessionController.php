@@ -23,7 +23,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended('/rapat');
     }
 
     public function destroy(Request $request): RedirectResponse
