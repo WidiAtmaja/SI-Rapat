@@ -91,7 +91,7 @@
                             <div>
                                 <label for="password" class="block text-sm font-medium text-gray-700">Password Baru
                                     (opsional)</label>
-                                <input id="password" name="password" type="password"
+                                <input id="password" name="password" type="password" required
                                     class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" />
                                 <x-input-error :messages="$errors->get('password')" class="mt-1" />
                             </div>
