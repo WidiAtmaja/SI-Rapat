@@ -12,17 +12,15 @@ use Illuminate\Support\Facades\Storage;
 class NotulenController extends Controller
 {
 
-    /**
-     * Menampilkan daftar notulensi (Refactored).
-     */
+    //fungsi mengirimkan data notulensi views
     public function index(Request $request)
     {
         $user = Auth::user();
         $urutan = $request->query('urutan', 'terbaru');
         $sortDirection = ($urutan == 'terlama') ? 'asc' : 'desc';
 
+        //queri menampilan notulensi dari rapat
         $query = Notulen::with(['rapat'])
-            // Pegawai hanya lihat notulen dari rapat yang mereka hadiri
             ->when($user->peran !== 'admin', function ($q) use ($user) {
                 $q->whereHas('rapat.absensis', function ($subQ) use ($user) {
                     $subQ->where('user_id', $user->id);
@@ -31,20 +29,15 @@ class NotulenController extends Controller
             ->orderBy('created_at', $sortDirection);
 
         $notulens = $query->get();
-
-        // Logika 'Unique' untuk Admin (dijalankan di collection)
         if ($user->peran === 'admin') {
-            // Ini masih tidak efisien, tapi sesuai logika Anda
             $notulens = $notulens->unique('rapat_id')->values();
         }
 
         return view('pages.notulensi', compact('notulens'));
     }
 
-    /**
-     * Tampilkan form create
-     */
-    public function create(Rapat $rapat) // <-- Gunakan R-M-B
+    //fungsi create
+    public function create(Rapat $rapat)
     {
         if (Auth::user()->peran !== 'admin') {
             abort(403, 'Hanya admin yang dapat membuat notulensi.');
@@ -52,15 +45,14 @@ class NotulenController extends Controller
         return view('pages.partials.create-notulensi', compact('rapat'));
     }
 
-    /**
-     * Simpan notulen baru (Refactored File Upload).
-     */
+    //fungsi post data notulensi ke database oleh admin
     public function store(Request $request)
     {
         if (Auth::user()->peran !== 'admin') {
             abort(403, 'Hanya admin yang dapat menambahkan notulensi.');
         }
 
+        //validasi setiap request sebelum di post ke database
         $validated = $request->validate([
             'rapat_id' => 'required|exists:rapats,id|unique:notulens,rapat_id',
             'ringkasan' => 'required|string',
@@ -72,22 +64,16 @@ class NotulenController extends Controller
         try {
             $path = null;
 
+            //menjalankan request dan merepalce untuk post file notulensi
             if ($request->hasFile('lampiran_file')) {
                 $rapat = Rapat::findOrFail($validated['rapat_id']);
-
-                // Bersihkan nama rapat dari karakter ilegal untuk nama file
                 $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $rapat->judul);
-
-                // Ambil ekstensi asli file
                 $extension = $request->file('lampiran_file')->getClientOriginalExtension();
-
-                // Bentuk nama file yang rapi
                 $fileName = "notulensi-{$safeName}." . $extension;
-
-                // Simpan file tanpa hash
                 $path = $request->file('lampiran_file')->storeAs('notulensi', $fileName, 'public');
             }
 
+            //notulensi dibuat
             Notulen::create([
                 'rapat_id' => $validated['rapat_id'],
                 'user_id' => Auth::id(),
@@ -102,20 +88,14 @@ class NotulenController extends Controller
         }
     }
 
-
-    /**
-     * Tampilkan detail notulen
-     */
+    //fungsi menampilkan notulensi untuk pengguna
     public function show(Rapat $rapat)
     {
-        // Cari notulen berdasarkan rapat_id, atau 404
         $notulen = Notulen::with('rapat')->where('rapat_id', $rapat->id)->firstOrFail();
         return view('pages.partials.detail-notulensi', compact('notulen'));
     }
 
-    /**
-     * Tampilkan form edit
-     */
+    //fungsi edit
     public function edit(Notulen $notulen)
     {
         if (Auth::user()->peran !== 'admin') {
@@ -124,15 +104,14 @@ class NotulenController extends Controller
         return view('pages.partials.edit-notulensi', compact('notulen'));
     }
 
-    /**
-     * Update notulen (Refactored File Upload).
-     */
+    //fungsi update notulensi oleh admin
     public function update(Request $request, Notulen $notulen)
     {
         if (Auth::user()->peran !== 'admin') {
             abort(403, 'Hanya admin yang dapat mengedit notulensi.');
         }
 
+        //validasi setiap request sebelum diupdate
         $validated = $request->validate([
             'ringkasan' => 'required|string',
             'lampiran_file' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
@@ -140,13 +119,12 @@ class NotulenController extends Controller
 
         $notulen->ringkasan = $validated['ringkasan'];
 
+        //jika ada file maka akan diganti atau diperbarui
         if ($request->hasFile('lampiran_file')) {
-            // Hapus file lama
             if ($notulen->lampiran_file) {
                 Storage::disk('public')->delete($notulen->lampiran_file);
             }
 
-            // Gunakan nama rapat untuk nama file
             $rapat = $notulen->rapat;
             $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $rapat->judul);
             $extension = $request->file('lampiran_file')->getClientOriginalExtension();
@@ -161,9 +139,7 @@ class NotulenController extends Controller
         return redirect()->route('notulensi.index')->with('success', 'Notulensi berhasil diperbarui.');
     }
 
-    /**
-     * Hapus notulen (Refactored).
-     */
+    //fungsi untuk menghapus notulensi oleh admin
     public function destroy(Notulen $notulen)
     {
         if (Auth::user()->peran !== 'admin') {
@@ -171,33 +147,27 @@ class NotulenController extends Controller
         }
 
         try {
-            // Cukup panggil delete().
-            // Model Notulen akan otomatis menghapus file di storage.
             $notulen->delete();
 
             return redirect()->route('notulensi.index')->with('success', 'Notulensi berhasil dihapus.');
         } catch (\Exception $e) {
-            // Log::error('Gagal hapus notulen: ' . $e->getMessage());
             return redirect()->route('notulensi.index')->with('error', 'Gagal menghapus notulensi.');
         }
     }
 
-    /**
-     * Download lampiran (Kode Anda sudah bagus).
-     */
+    //fungsi untuk mendownload lampiran file notulensi
     public function download(Notulen $notulen)
     {
         if (!$notulen->lampiran_file) {
             return redirect()->back()->with('error', 'Tidak ada file lampiran.');
         }
 
-        $filePath = $notulen->lampiran_file; // Path sudah benar dari DB
+        $filePath = $notulen->lampiran_file;
 
         if (!Storage::disk('public')->exists($filePath)) {
             return redirect()->back()->with('error', 'File lampiran tidak ditemukan di server.');
         }
 
-        // Ambil nama file asli, atau gunakan nama dari path
         $fileName = basename($filePath);
         return Storage::disk('public')->download($filePath, $fileName);
     }

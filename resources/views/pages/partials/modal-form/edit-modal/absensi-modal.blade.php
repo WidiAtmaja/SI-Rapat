@@ -1,6 +1,5 @@
 {{-- Modal Edit Absensi --}}
 <x-modal-base title="Edit Absensi {{ $absen->rapat->judul }}" max-width="lg" :scrollable="false">
-    {{-- Tombol Trigger --}}
     <x-slot:trigger>
         <button
             class="mr-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
@@ -20,7 +19,6 @@
                 <div class="flex items-center text-sm my-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#323232"
                         viewBox="0 0 24 24">
-                        <!--Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free-->
                         <path
                             d="m19,4h-2v-2h-2v2h-6v-2h-2v2h-2c-1.1,0-2,.9-2,2v14c0,1.1.9,2,2,2h14c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2ZM5,20v-12h14v-2,14s-14,0-14,0Z">
                         </path>
@@ -76,7 +74,6 @@
         </div>
     </form>
 
-    {{-- Footer Buttons --}}
     <x-slot:footer>
         <button type="button" @click="open = false"
             class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition">

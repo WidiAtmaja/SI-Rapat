@@ -6,17 +6,16 @@
                     <h1 class="text-xl font-semibold">Notulensi</h1>
                     <div class="items-center flex">
 
+                        {{-- Modal membuat notulensi --}}
                         @if (auth()->user()->peran === 'admin')
                             @include('pages.partials.modal-form.create-modal.notulensi-modal')
                         @endif
 
-                        {{-- Dropdown Filter Urutan (Terbaru/Terlama) --}}
+                        {{-- Dropdown Filter Urutan --}}
                         <form action="{{ route('notulensi.index') }}" method="GET" class="inline-block">
                             <div class="relative inline-block pr-3">
-                                {{-- Filter ini akan mengirim parameter 'urutan' ke URL --}}
                                 <select name="urutan" onchange="this.form.submit()"
                                     class="appearance-none w-auto max-w-44 pl-3 pr-8 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 cursor-pointer transition">
-                                    {{-- Default 'terbaru' (jika 'urutan' tidak ada di URL) --}}
                                     <option value="terbaru" @selected(request('urutan') == 'terbaru' || !request('urutan'))>Terbaru</option>
                                     <option value="terlama" @selected(request('urutan') == 'terlama')>Terlama</option>
                                 </select>
@@ -26,19 +25,20 @@
                     </div>
                 </div>
 
+                {{-- Card Notulensi --}}
                 <div class="p-6">
                     <div class="overflow-x-auto space-y-4">
                         @forelse ($notulens as $item)
                             <div
                                 class="bg-white border-l-4 border-l-blue-500 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <!-- Header Section -->
+                                {{-- Judul Notulensi --}}
                                 <div class="flex p-4 border-b justify-between border-gray-100">
                                     <h2 class="text-lg font-bold text-gray-900">
                                         {{ $item->rapat->judul ?? 'Judul Rapat Tidak Diketahui' }}
                                     </h2>
                                 </div>
 
-                                <!-- Content Section -->
+                                <!-- Tanggal -->
                                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4">
                                     <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
                                         <div class="flex items-center gap-1.5">
@@ -57,6 +57,7 @@
                                             <span
                                                 class="text-gray-600">{{ \Carbon\Carbon::parse($item->rapat->tanggal)->format('d M Y') }}</span>
                                         </div>
+                                        <!-- Waktu -->
                                         <div class="flex items-center gap-1.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                                 fill="#323232" viewBox="0 0 24 24">
@@ -72,6 +73,7 @@
                                                 {{ \Carbon\Carbon::parse($item->rapat->waktu_selesai)->translatedFormat('H.i') }}
                                                 WITA</span>
                                         </div>
+                                        <!-- Lokasi -->
                                         <div class="flex items-center gap-1.5">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                                 fill="#323232" viewBox="0 0 24 24">
@@ -85,13 +87,13 @@
                                             <span class="text-gray-600">{{ $item->rapat->lokasi ?? '-' }}</span>
                                         </div>
                                     </div>
-
+                                    <!-- Tombol Lihat Detail -->
                                     <div class="flex gap-2 mt-3 md:mt-0">
                                         <a href="{{ route('notulensi.show', $item->rapat_id) }}"
                                             class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
                                             Lihat Detail
                                         </a>
-
+                                        <!-- Tombol Hapus -->
                                         @if (auth()->user()->peran === 'admin')
                                             <form action="{{ route('notulensi.destroy', $item->id) }}" method="POST"
                                                 onsubmit="confirmDelete(event, this)">
@@ -103,6 +105,7 @@
                                                     Hapus
                                                 </button>
                                             </form>
+                                            <!-- Tombol Edit Notulensi -->
                                             @include('pages.partials.modal-form.edit-modal.notulensi-modal')
                                         @endif
                                     </div>

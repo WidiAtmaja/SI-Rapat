@@ -1,3 +1,4 @@
+//script sidebar
 function initializeSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');

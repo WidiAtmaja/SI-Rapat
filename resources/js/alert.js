@@ -70,25 +70,18 @@ window.confirmDelete = function(event, form) { // <-- 1. Tambahkan 'event' di si
 
 // Auto run ketika halaman dimuat
 document.addEventListener('DOMContentLoaded', function() {
-    // Cek apakah halaman di-load dari cache (back/forward button)
-    // Jika dari cache, jangan tampilkan alert
     const navigation = performance.getEntriesByType('navigation')[0];
     
     if (navigation && navigation.type === 'back_forward') {
-        // Halaman di-load dari cache, jangan tampilkan alert
         console.log('Page loaded from cache, skipping alert');
         return;
     }
-    
-    // Halaman di-load normal, tampilkan alert jika ada
     showAlert();
 });
 
-// Tambahan: Clear cache ketika user meninggalkan halaman
+// Clear cache ketika pengguna meninggalkan halaman
 window.addEventListener('pageshow', function(event) {
-    // Jika halaman di-load dari bfcache (back-forward cache)
     if (event.persisted) {
-        // Reload halaman untuk mendapatkan data fresh
         window.location.reload();
     }
 });

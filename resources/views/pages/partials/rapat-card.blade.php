@@ -3,60 +3,25 @@
     <div class="max-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
         <div class="p-5">
             <div class="flex justify-between items-center">
+                {{-- Judul --}}
                 <h5 class="mb-2 text-lg font-semibold tracking-tight text-gray-900">
                     {{ $item->judul }}
                 </h5>
+
+                {{-- Tombol hapus dan edit rapat --}}
                 @if (auth()->user()->peran === 'admin')
                     <div class="relative inline-block text-left">
-                        {{--  Dropdown --}}
-                        <div x-data="{ open: false }" class="relative inline-block text-left">
-                            <div>
-                                <button @click="open = !open" type="button"
-                                    class="p-2 text-gray-700 hover:bg-gray-100 rounded-md inline-flex items-center justify-center"
-                                    id="dropdownButton-{{ $item->id }}" aria-haspopup="true"
-                                    :aria-expanded="open.toString()"> <svg xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor" viewBox="0 0 32 32" class="w-5 h-5 text-gray-700">
-                                        <path d="M13,16c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S13,14.346,13,16z">
-                                        </path>
-                                        <path d="M13,26c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S13,24.346,13,26z">
-                                        </path>
-                                        <path d="M13,6c0,1.654,1.346,3,3,3s3-1.346,3-3s-1.346-3-3-3S13,4.346,13,6z">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div x-show="open" @click.away="open = false"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute right-0 mt-2 w-44 z-10 origin-top-right bg-white divide-y divide-gray-100 rounded-lg shadow-sm border border-gray-200"
-                                role="menu" aria-orientation="vertical"
-                                aria-labelledby="dropdownButton-{{ $item->id }}" x-cloak>
-
-                                <ul class="py-2 text-sm text-gray-700" role="none">
-                                    <li>
-                                        @include('pages.partials.modal-form.edit-modal.rapat-modal')
-                                    </li>
-
-                                    <li>
-                                        <form action="{{ route('rapat.destroy', $item->id) }}" method="POST"
-                                            onsubmit="confirmDelete(event,this)" role="none">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" @click="open = false"
-                                                class="w-full font-semibold text-left px-4 py-2 hover:bg-gray-100 text-red-600"
-                                                role="menuitem">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                        @include('pages.partials.modal-form.edit-modal.rapat-modal')
+                        <form action="{{ route('rapat.destroy', $item->id) }}" method="POST"
+                            onsubmit="confirmDelete(event,this)" role="none">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" @click="open = false"
+                                class="w-full font-medium text-sm text-left px-4 hover:bg-gray-100 text-red-600"
+                                role="menuitem">
+                                Hapus
+                            </button>
+                        </form>
                     </div>
                 @endif
             </div>
@@ -106,15 +71,12 @@
                     </svg>
                     <span class="text-sm text-gray-600">{{ $item->lokasi }}</span>
                 </div>
-
             </div>
-
 
             <div class="flex justify-between items-center">
                 <a href="{{ route('rapat.show', $item->id) }}"
                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-blue-700 rounded-lg hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300">
                     Detail
-
                 </a>
                 <a href="{{ $item->link_zoom }}" target="_blank"
                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">

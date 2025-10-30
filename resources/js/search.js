@@ -1,10 +1,11 @@
+//script untuk pencarian global
 document.addEventListener('DOMContentLoaded', function () {
     
     const searchInput = document.getElementById('default-search');
     const resultsContainer = document.getElementById('search-results');
     let debounceTimer;
 
-    // --- Helper function untuk format tanggal ---
+    //Helper function untuk format tanggal
     function formatDate(dateString) {
         const options = { year: 'numeric', month: 'short', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('id-ID', options);
@@ -15,11 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         searchInput.addEventListener('input', function (e) {
             const query = e.target.value;
             clearTimeout(debounceTimer);
-
-            // --- ▼▼▼ PERUBAHAN DI SINI ▼▼▼ ---
-            // Ubah dari 3 menjadi 1
             if (query.length < 1) { 
-            // --- ▲▲▲ SELESAI ▲▲▲ ---
                 resultsContainer.innerHTML = '';
                 resultsContainer.classList.add('hidden');
                 return;
@@ -27,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Set timer debounce baru (300ms)
             debounceTimer = setTimeout(() => {
-                // Tampilkan spinner loading
+                // menampilkan spinner loading
                 resultsContainer.innerHTML = `
                     <div class="flex items-center justify-center p-4">
                         <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -60,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 300); 
         });
 
-        // Sembunyikan hasil jika klik di luar
+        // sembunyikan hasil jika klik di luar
         document.addEventListener('click', function (e) {
             const searchWrapper = searchInput.closest('.relative');
             if (!searchWrapper.contains(e.target)) {
@@ -69,13 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /**
-     * Merender data JSON ke dalam container hasil
-     */
     function renderResults(data, userRole) {
         resultsContainer.innerHTML = ''; 
-
-        // ▼▼▼ UBAH DISINI ▼▼▼ (absensi -> absensis)
         if ((!data.rapat || !data.rapat.length) && (!data.absensis || !data.absensis.length) && (!data.notulensi || !data.notulensi.length)) {
             resultsContainer.innerHTML = '<div class="p-3 text-gray-500 text-sm">Tidak ada hasil ditemukan.</div>';
             resultsContainer.classList.remove('hidden');
@@ -84,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let html = '';
 
-        // --- Bagian Rapat (Sudah Benar) ---
+        //Bagian Rapat
         if (data.rapat && data.rapat.length > 0) {
             html += '<div class="border-b">';
             html += '<strong class="block text-base font-extrabold px-3 pt-2 pb-1 text-gray-900 uppercase">Rapat</strong>';
@@ -126,21 +118,14 @@ document.addEventListener('DOMContentLoaded', function () {
             html += '</div>';
         }
 
-        // --- ▼▼▼ PERBAIKI BAGIAN INI ▼▼▼ ---
-        if (data.absensis && data.absensis.length > 0) { // <--- UBAH (1)
+        if (data.absensis && data.absensis.length > 0) {
             html += '<div class="border-b">';
             html += '<strong class="block text-base font-extrabold px-3 pt-2 pb-1 text-gray-900 uppercase">Absensi</strong>';
             
-            data.absensis.forEach(item => { // <--- UBAH (2)
+            data.absensis.forEach(item => {
                 let kehadiranBadge = '';
-                
-                // --- UBAH (3) ---
-                // Data relasi sekarang ada di 'item.absensis' (sesuai 'with' di controller)
                 if (userRole === 'pegawai' && item.absensis && item.absensis.length > 0) { 
-                    
-                    // --- UBAH (4) ---
                     const status = item.absensis[0].kehadiran; 
-                    
                     const color = status === 'hadir' ? 'text-green-700 bg-green-100' : 'text-yellow-700 bg-yellow-100';
                     kehadiranBadge = `<span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full ${color}">${status}</span>`;
                 }
@@ -164,9 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             html += '</div>';
         }
-        // --- ▲▲▲ SELESAI PERBAIKAN ABSENSI ▲▲▲ ---
 
-        // --- Render Bagian Notulensi (Sudah Benar) ---
         if (data.notulensi && data.notulensi.length > 0) {
             html += '<div>';
             html += '<strong class="block text-base font-extrabold px-3 pt-2 pb-1 text-gray-900 uppercase">Notulensi</strong>';

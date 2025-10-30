@@ -10,6 +10,7 @@
 
     <div class="flex-1 px-16 max-w-sm mr-auto sm:ml-8 relative">
 
+        <!-- tombol search -->
         <form class="relative">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -43,6 +44,7 @@
             </x-slot>
 
             <x-slot name="content">
+                <!-- profil -->
                 <x-dropdown-link :href="route('profile.edit')">
                     Profil
                 </x-dropdown-link>

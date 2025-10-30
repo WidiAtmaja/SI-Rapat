@@ -1,9 +1,15 @@
+{{-- Modal Tambah Pengguna --}}
 <x-modal-base title="Tambah Pengguna Baru Excel" max-width="lg" :scrollable="false">
     <x-slot:trigger>
-        <button
-            class="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-            type="button">
-            Tambah Pengguna Excell
+        <button type="button"
+            class="flex items-center justify-center gap-2 w-full text-green-600 hover:bg-green-50 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#00c23c" viewBox="0 0 24 24">
+                <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"></path>
+                <path
+                    d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8">
+                </path>
+            </svg>
+            Tambah Excel
         </button>
     </x-slot:trigger>
 
@@ -11,7 +17,7 @@
         enctype="multipart/form-data">
         @csrf
         <div class="grid gap-4 grid-cols-2">
-            {{-- File --}}
+            {{-- Lampiran File Excell --}}
             <div class="col-span-2">
                 <label class="block mb-2 text-sm font-medium text-gray-900">Lampiran File Excel</label>
                 <div id="drop-area"

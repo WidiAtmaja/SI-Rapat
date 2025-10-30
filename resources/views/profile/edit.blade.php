@@ -15,6 +15,7 @@
                         @csrf
                         @method('patch')
 
+                        <!-- NIP -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="nip" class="block text-sm font-medium text-gray-700">NIP</label>
@@ -24,6 +25,7 @@
                                 <x-input-error :messages="$errors->get('nip')" class="mt-1" />
                             </div>
 
+                            <!-- Nama -->
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
                                 <input id="name" name="name" type="text"
@@ -32,6 +34,7 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-1" />
                             </div>
 
+                            <!-- Unit Kerja -->
                             <div>
                                 <label for="unit_kerja" class="block text-sm font-medium text-gray-700">Unit
                                     Kerja</label>
@@ -41,6 +44,7 @@
                                 <x-input-error :messages="$errors->get('unit_kerja')" class="mt-1" />
                             </div>
 
+                            <!-- Jabatan -->
                             <div>
                                 <label for="jabatan" class="block text-sm font-medium text-gray-700">Jabatan</label>
                                 <input id="jabatan" name="jabatan" type="text"
@@ -49,6 +53,7 @@
                                 <x-input-error :messages="$errors->get('jabatan')" class="mt-1" />
                             </div>
 
+                            <!-- Nomor HP -->
                             <div>
                                 <label for="no_hp" class="block text-sm font-medium text-gray-700">No. HP</label>
                                 <input id="no_hp" name="no_hp" type="text"
@@ -57,6 +62,7 @@
                                 <x-input-error :messages="$errors->get('no_hp')" class="mt-1" />
                             </div>
 
+                            <!-- Jenis Kelamin -->
                             <div>
                                 <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700">Jenis
                                     Kelamin</label>
@@ -72,7 +78,7 @@
                                 </select>
                                 <x-input-error :messages="$errors->get('jenis_kelamin')" class="mt-1" />
                             </div>
-
+                            <!-- Email -->
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                                 <input id="email" name="email" type="email"
@@ -81,6 +87,7 @@
                                 <x-input-error :messages="$errors->get('email')" class="mt-1" />
                             </div>
 
+                            <!-- Passowrd -->
                             <div>
                                 <label for="password" class="block text-sm font-medium text-gray-700">Password Baru
                                     (opsional)</label>

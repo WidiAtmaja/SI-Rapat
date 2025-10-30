@@ -9,8 +9,8 @@
     <div class="flex flex-1 flex-col overflow-y-auto">
         <nav class="space-y-2">
 
+            {{-- Menu Rapat diakses admin --}}
             @if (auth()->user()->peran === 'admin')
-                {{-- Menu Rapat --}}
                 <a href="/rapat"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
                 {{ Request::is('rapat*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-900' }}">
@@ -23,8 +23,8 @@
                 </a>
             @endif
 
+            {{-- Menu rapat diakses pegawai --}}
             @if (auth()->user()->peran === 'pegawai')
-                {{-- Menu Rapat --}}
                 <a href="/rapat"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
                 {{ Request::is('rapat*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-900' }}">
@@ -37,7 +37,7 @@
                 </a>
             @endif
 
-            {{-- Menu Absensi --}}
+            {{-- Menu Absensi diakses admin --}}
             @if (auth()->user()->peran === 'admin')
                 <a href="/absensi"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
@@ -51,8 +51,8 @@
                 </a>
             @endif
 
+            {{-- Menu Absensi DiAkses pegawai --}}
             @if (auth()->user()->peran === 'pegawai')
-                {{-- Menu Absensi --}}
                 <a href="/absensi"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
                 {{ Request::is('absensi*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-900' }}">
@@ -65,7 +65,7 @@
                 </a>
             @endif
 
-            {{-- Menu Notulensi --}}
+            {{-- Menu Notulensi diakses admin --}}
             @if (auth()->user()->peran === 'admin')
                 <a href="/notulensi"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
@@ -79,8 +79,8 @@
                 </a>
             @endif
 
+            {{-- Menu Notulensi diakses pegawai --}}
             @if (auth()->user()->peran === 'pegawai')
-                {{-- Menu Notulensi --}}
                 <a href="/notulensi"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
                 {{ Request::is('notulensi*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-900' }}">
@@ -93,14 +93,13 @@
                 </a>
             @endif
 
+            {{-- Menu manajemen pengguna diakses admin --}}
             @if (auth()->user()->peran === 'admin')
-                {{-- Menu Notulensi --}}
                 <a href="/manajemen-pengguna"
                     class="flex items-center rounded-md px-4 py-2.5 transition-all duration-200 
             {{ Request::is('manajemen-pengguna*') ? 'bg-blue-100 text-blue-600 font-semibold' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-900' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#898989"
                         viewBox="0 0 24 24">
-                        <!--Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free-->
                         <path
                             d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5m0-8c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3M4 22h16c.55 0 1-.45 1-1v-1c0-3.86-3.14-7-7-7h-4c-3.86 0-7 3.14-7 7v1c0 .55.45 1 1 1m6-7h4c2.76 0 5 2.24 5 5H5c0-2.76 2.24-5 5-5">
                         </path>

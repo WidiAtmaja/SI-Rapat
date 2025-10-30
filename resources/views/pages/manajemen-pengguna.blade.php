@@ -6,10 +6,9 @@
                 <div class="flex p-7 justify-between items-center border-b border-gray-200">
                     <h1 class="text-xl font-semibold text-gray-800">Manajemen Pengguna</h1>
                     <div class="flex justify-between items-center">
+                        <!-- FIlter ROle Pengguna -->
                         <form action="{{ route('user.index') }}" method="GET" class="inline-block">
-                            {{-- TAMBAHKAN INI: Mengingat filter urutan yang sedang aktif --}}
                             <input type="hidden" name="peran" value="{{ request('admin', 'pegawai') }}">
-
                             <div class="relative inline-block pr-3">
                                 <select name="peran" onchange="this.form.submit()"
                                     class="appearance-none w-auto max-w-48 pl-3 pr-8 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 cursor-pointer transition">
@@ -19,6 +18,7 @@
                                 </select>
                             </div>
                         </form>
+                        <!-- form pencarian pengguna -->
                         <form method="GET" action="{{ route('user.index') }}" class="px-2 relative">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-6 pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -31,42 +31,11 @@
                                 class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                                 value="{{ request('search') }}" placeholder="Cari Pengguna" />
                         </form>
-                        <div x-data="{ open: false }" class="relative inline-block text-left">
-                            {{-- Tombol toggle dropdown --}}
-                            <button @click="open = !open" type="button"
-                                class="px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg inline-flex items-center gap-2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                                aria-haspopup="true" :aria-expanded="open.toString()">
-                                <span>Tambah Pengguna</span>
-                                {{-- Ikon panah bawah --}}
-                                <svg class="w-4 h-4 text-white transition-transform duration-200"
-                                    :class="{ 'rotate-180': open }" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            {{-- Dropdown menu --}}
-                            <div x-show="open" @click.away="open = false"
-                                x-transition:enter="transition ease-out duration-100"
-                                x-transition:enter-start="transform opacity-0 scale-95"
-                                x-transition:enter-end="transform opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="transform opacity-100 scale-100"
-                                x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute right-0 mt-2 w-48 z-10 origin-top-right bg-white divide-y divide-gray-100 rounded-lg shadow-lg border border-gray-200"
-                                role="menu" aria-orientation="vertical" x-cloak>
-
-                                <ul class="py-2 text-sm text-gray-700" role="none">
-                                    <li class="hover:bg-gray-100">
-                                        @include('pages.partials.modal-form.create-modal.pengguna-modal')
-                                    </li>
-                                    <li class="hover:bg-gray-100">
-                                        @include('pages.partials.modal-form.create-modal.pengguna-excel-modal')
-                                    </li>
-
-                                </ul>
-                            </div>
+                        <div>
+                            <!-- Modal membuat pengguna -->
+                            @include('pages.partials.modal-form.create-modal.pengguna-modal')
+                            <!-- Modal membuat pengguna dengan excel -->
+                            @include('pages.partials.modal-form.create-modal.pengguna-excel-modal')
                         </div>
                     </div>
                 </div>
@@ -129,7 +98,6 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <!-- Update colspan ke 8 (sesuai jumlah kolom) -->
                                         <td colspan="8" class="px-6 py-4 text-center text-gray-500">
                                             Tidak ada data pengguna yang ditemukan.
                                         </td>

@@ -1,26 +1,22 @@
-// Kalender Rapat Interactive
+//script kalender rapat
 class KalenderRapat {
     constructor() {
         this.currentDate = new Date();
         this.currentView = 'month';
         this.rapatData = window.rapatData || [];
-        
         console.log('Kalender initialized with data:', this.rapatData);
-        
         this.init();
     }
 
     init() {
         this.setupEventListeners();
-        
-        // Delay render to ensure DOM is ready
         setTimeout(() => {
             this.renderCalendar();
         }, 100);
     }
 
     setupEventListeners() {
-        // Navigation buttons
+        // Navigasi tombol
         document.getElementById('todayBtn')?.addEventListener('click', () => {
             this.currentDate = new Date();
             this.renderCalendar();
@@ -34,14 +30,14 @@ class KalenderRapat {
             this.navigateCalendar(1);
         });
 
-        // View buttons
+        // tombol melihat
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 this.changeView(e.target.dataset.view);
             });
         });
 
-        // Modal close
+        // modal tutup
         document.getElementById('closeModal')?.addEventListener('click', () => {
             this.closeModal();
         });
@@ -66,8 +62,7 @@ class KalenderRapat {
 
     changeView(view) {
         this.currentView = view;
-        
-        // Update button states
+        //state update tombol 
         document.querySelectorAll('.view-btn').forEach(btn => {
             if (btn.dataset.view === view) {
                 btn.classList.remove('bg-gray-100');
@@ -104,6 +99,7 @@ class KalenderRapat {
         }
     }
 
+    //render bulanan
     renderMonthView() {
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
@@ -124,19 +120,19 @@ class KalenderRapat {
                 <div class="grid grid-cols-7 divide-x divide-y divide-gray-200">
         `;
         
-        // Previous month days
+        // bulan hari sebelumnya
         for (let i = firstDayIndex - 1; i >= 0; i--) {
             const day = prevLastDayDate - i;
             html += this.renderDayCell(day, true, new Date(year, month - 1, day));
         }
         
-        // Current month days
+        // bulan hari sekarang
         for (let day = 1; day <= lastDayDate; day++) {
             const currentDate = new Date(year, month, day);
             html += this.renderDayCell(day, false, currentDate);
         }
         
-        // Next month days
+        // bulan hari selanjutnya
         const totalCells = firstDayIndex + lastDayDate;
         const remainingCells = totalCells <= 35 ? 35 - totalCells : 42 - totalCells;
         for (let day = 1; day <= remainingCells; day++) {
@@ -154,6 +150,7 @@ class KalenderRapat {
         }
     }
 
+    //render mingguan
     renderWeekView() {
         const startOfWeek = new Date(this.currentDate);
         startOfWeek.setDate(this.currentDate.getDate() - this.currentDate.getDay());
@@ -194,6 +191,7 @@ class KalenderRapat {
         document.getElementById('calendarContainer').innerHTML = html;
     }
 
+    //render harian
     renderDayView() {
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
@@ -240,10 +238,9 @@ class KalenderRapat {
         document.getElementById('calendarContainer').innerHTML = html;
     }
 
+    //render header harian
     renderDayHeaders() {
         const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-        
-        // FIX: Dibuat lebih besar (p-4) dan font lebih tebal
         return days.map((day, index) => `
             <div class="p-4 text-center">
                 <span class="text-sm font-semibold text-gray-700 uppercase">${day}</span>
@@ -251,10 +248,7 @@ class KalenderRapat {
         `).join('');
     }
 
-   // public/js/kalender-rapat.js
-
-    // ... (fungsi-fungsi lain biarkan saja) ...
-
+    //render harian sell
     renderDayCell(day, isOtherMonth, date, isWeekView = false) {
         const today = new Date();
         const isToday = date.getDate() === today.getDate() && 
@@ -276,17 +270,14 @@ class KalenderRapat {
         }
         const dayNumberClass = `${dayNumberBaseClass} ${dayColorClass}`;
 
-        // DIUBAH: Logika untuk tampilan rapat di dalam sel
         let rapatHtml = '';
         if (rapatForDay.length > 0 && !isOtherMonth) {
             
             rapatForDay.forEach(rapat => {
                 const statusConfig = this.getStatusConfig(rapat.status);
 
-                // Tentukan ikon: Zoom (jika ada link) atau ikon status default
-                let meetingIcon = statusConfig.icon; // Ikon default (sudah berwarna)
+                let meetingIcon = statusConfig.icon;
                 if (rapat.link_zoom) {
-                    // Ikon video/zoom, warnanya ambil dari textColor di config
                     meetingIcon = `<svg class="w-4 h-4 ${statusConfig.textColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                     </svg>`;
@@ -335,11 +326,8 @@ class KalenderRapat {
         
         return this.rapatData.filter(rapat => {
             if (!rapat.tanggal) return false;
-            
-            // Handle both date formats: YYYY-MM-DD and DD/MM/YYYY
             let rapatDate = rapat.tanggal;
-            
-            // Convert to Date object if string
+
             if (typeof rapatDate === 'string') {
                 rapatDate = new Date(rapatDate);
             }
@@ -350,7 +338,6 @@ class KalenderRapat {
     }
 
     formatDateForComparison(date) {
-        // Ensure date is Date object
         if (!(date instanceof Date)) {
             date = new Date(date);
         }
@@ -366,32 +353,28 @@ class KalenderRapat {
         return date.toLocaleDateString('id-ID', options);
     }
 
+    //format waktu indonesia
     formatIndonesianTime(dateTimeString) {
         if (!dateTimeString) return 'N/A';
         
         try {
             const date = new Date(dateTimeString);
-            
-            // Cek apakah tanggal valid. 
-            // Jika tidak valid, mungkin itu sudah string waktu seperti "09:00:00"
             if (isNaN(date.getTime())) {
                 if (typeof dateTimeString === 'string' && dateTimeString.match(/^\d{2}:\d{2}(:\d{2})?$/)) {
-                    return dateTimeString.substring(0, 5); // Ambil HH:mm
+                    return dateTimeString.substring(0, 5);
                 }
-                return dateTimeString; // Kembalikan apa adanya
+                return dateTimeString;
             }
             
-            // Format ke Waktu Indonesia (WITA)
-            // Ganti 'Asia/Makassar' (WITA) dengan 'Asia/Jakarta' (WIB) jika perlu
             return date.toLocaleTimeString('id-ID', {
-                timeZone: 'Asia/Makassar', // Zona Waktu WITA
+                timeZone: 'Asia/Makassar',
                 hour: '2-digit',
                 minute: '2-digit',
-                hour12: false // Format 24 jam
+                hour12: false
             });
         } catch (e) {
             console.error('Error parsing time:', dateTimeString, e);
-            return dateTimeString; // Fallback jika ada error
+            return dateTimeString;
         }
     }
 
@@ -486,6 +469,7 @@ class KalenderRapat {
         document.getElementById('detailRapatModal').classList.remove('hidden');
     }
 
+    //menampilan detial rapat
     showRapatDetail(rapatId) {
         const rapat = this.rapatData.find(r => r.id === rapatId);
         if (!rapat) return;

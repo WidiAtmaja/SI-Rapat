@@ -21,23 +21,16 @@ class Rapat extends Model
         'status',
     ];
 
-    /**
-     * Otomatis hapus relasi (Absensi & Notulensi) saat model Rapat dihapus.
-     */
     protected static function booted(): void
     {
         static::deleting(function (Rapat $rapat) {
-            // Hapus semua notulensi terkait (ini akan memicu event 'deleting' di model Notulen)
             $rapat->notulensi()->each(function ($notulen) {
                 $notulen->delete();
             });
-
-            // Hapus semua absensi terkait
             $rapat->absensis()->delete();
         });
     }
 
-    // Relasi (sudah benar)
     public function pic()
     {
         return $this->belongsTo(User::class, 'pic_id');

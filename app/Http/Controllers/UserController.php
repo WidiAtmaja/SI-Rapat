@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Absensi;
+use App\Models\Rapat;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -14,15 +16,10 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
-    /**
-     * Menampilkan daftar semua pengguna (pegawai).
-     * Admin bisa filter berdasarkan peran atau mencari.
-     */
+    //fungsi index pengguna dan pencarian pengguna
     public function index(Request $request)
     {
         $query = User::query();
-
-        // Fitur Pencarian Sederhana
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -33,31 +30,20 @@ class UserController extends Controller
             });
         }
 
-        // Filter berdasarkan Peran
         if ($request->has('peran') && $request->peran != '' && $request->peran !== 'semua') {
             $query->where('peran', $request->peran);
         }
 
-
-        // Ambil data dengan urutan terbaru dan pagination
         $users = $query->get();
-
-        // Anda perlu membuat view 'pages.manajemen-user'
         return view('pages.manajemen-pengguna', compact('users'));
     }
 
-    /**
-     * Menampilkan form untuk membuat user baru.
-     */
     public function create()
     {
-        // Anda perlu membuat view 'pages.partials.create-user'
         return view('pages.partials.create-user');
     }
 
-    /**
-     * Menyimpan user baru ke database.
-     */
+    //fungsi membuat akun pengguna
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -73,7 +59,6 @@ class UserController extends Controller
         ]);
 
         try {
-            // 1️⃣ Buat user baru
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -86,15 +71,10 @@ class UserController extends Controller
                 'jenis_kelamin' => $validated['jenis_kelamin'],
             ]);
 
-            // 2️⃣ Jika user adalah pegawai, otomatis buat absensi default
             if ($user->peran === 'pegawai') {
-                // Pastikan modelnya di-import:
-                // use App\Models\Rapat;
-                // use App\Models\Absensi;
-                // use Carbon\Carbon;
 
-                $rapatIds = \App\Models\Rapat::pluck('id');
-                $now = \Carbon\Carbon::now();
+                $rapatIds = Rapat::pluck('id');
+                $now = Carbon::now();
 
                 $data = $rapatIds->map(fn($rapatId) => [
                     'rapat_id' => $rapatId,
@@ -105,7 +85,7 @@ class UserController extends Controller
                 ])->toArray();
 
                 if (count($data)) {
-                    \App\Models\Absensi::insert($data);
+                    Absensi::insert($data);
                 }
             }
 
@@ -116,23 +96,17 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Menampilkan form untuk mengedit user.
-     */
+    //fungsi edit
     public function edit(User $user)
     {
-        // Anda perlu membuat view 'pages.partials.edit-user'
         return view('pages.partials.edit-user', compact('user'));
     }
 
-    /**
-     * Update data user di database.
-     */
+    //fungsi update pengguna
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            // Pastikan email unik, KECUALI untuk user ini sendiri
             'email' => [
                 'required',
                 'string',
@@ -140,7 +114,6 @@ class UserController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            // Password opsional, hanya jika ingin diubah
             'password' => ['nullable', 'confirmed', Password::min(8)],
             'nip' => [
                 'nullable',
@@ -156,7 +129,6 @@ class UserController extends Controller
         ]);
 
         try {
-            // Update data dasar
             $user->name = $validated['name'];
             $user->email = $validated['email'];
             $user->nip = $validated['nip'];
@@ -166,7 +138,6 @@ class UserController extends Controller
             $user->no_hp = $validated['no_hp'];
             $user->jenis_kelamin = $validated['jenis_kelamin'];
 
-            // Update password HANYA JIKA diisi
             if (!empty($validated['password'])) {
                 $user->password = Hash::make($validated['password']);
             }
@@ -180,13 +151,10 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Hapus user dari database.
-     */
+    //fungsi hapus pengguna
     public function destroy(User $user)
     {
         try {
-            // Opsi: Jangan biarkan admin menghapus diri sendiri
             if ($user->id === Auth::id()) {
                 return redirect()->route('user.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
             }
@@ -199,6 +167,7 @@ class UserController extends Controller
         }
     }
 
+    //fungsi buat pengguna menggunakan excell
     public function importExcel(Request $request)
     {
         $request->validate([
@@ -206,20 +175,14 @@ class UserController extends Controller
         ]);
 
         try {
-            // Ambil data Excel
             $data = Excel::toArray([], $request->file('lampiran_file'))[0];
-
             if (empty($data) || count($data) <= 1) {
                 return back()->with('error', 'File Excel kosong atau tidak sesuai format.');
             }
-
-            // Lewati header
             $rows = array_slice($data, 1);
-
             foreach ($rows as $row) {
-                if (count($row) < 10) continue; // Pastikan kolom lengkap
+                if (count($row) < 10) continue;
 
-                // Simpan / update user
                 $user = User::updateOrCreate(
                     ['email' => $row[7]],
                     [
@@ -235,19 +198,17 @@ class UserController extends Controller
                     ]
                 );
 
-                // Tambahkan absensi otomatis jika pegawai baru
                 if ($user->peran === 'pegawai') {
-                    $rapatIds = \App\Models\Rapat::pluck('id');
-                    $now = \Carbon\Carbon::now();
+                    $rapatIds = Rapat::pluck('id');
+                    $now = Carbon::now();
 
-                    // Cek apakah absensi untuk user & rapat sudah ada
                     foreach ($rapatIds as $rapatId) {
-                        $exists = \App\Models\Absensi::where('user_id', $user->id)
+                        $exists = Absensi::where('user_id', $user->id)
                             ->where('rapat_id', $rapatId)
                             ->exists();
 
                         if (!$exists) {
-                            \App\Models\Absensi::create([
+                            Absensi::create([
                                 'rapat_id' => $rapatId,
                                 'user_id' => $user->id,
                                 'kehadiran' => 'tidak hadir',

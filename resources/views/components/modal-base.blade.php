@@ -15,8 +15,6 @@
             'xl' => 'sm:max-w-xl',
             '2xl' => 'sm:max-w-2xl',
         ][$maxWidth] ?? 'sm:max-w-md';
-
-    // bodyClass otomatis menyesuaikan
     $bodyClass = $scrollable ? 'flex-1 min-h-[56vh] max-h-[56vh] overflow-y-auto scrollbar-hide pr-1' : 'flex-1';
 @endphp
 

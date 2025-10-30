@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable; // Tambahkan HasFactory jika belum ada
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +19,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        // --- TAMBAHKAN FIELD KUSTOM ANDA DI SINI ---
         'nip',
         'unit_kerja',
         'jabatan',
@@ -45,7 +44,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', // Breeze modern menggunakan cast 'hashed'
+        'password' => 'hashed',
     ];
 
     /**

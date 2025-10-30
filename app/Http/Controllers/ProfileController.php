@@ -12,9 +12,7 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
+    //fungsi edit profil
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -22,13 +20,12 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
+    //fungsi untuk mengupdate profile
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
 
+        //validasi setiap request sebelum update
         $validated = $request->validate([
             'nip' => 'nullable|string|max:50|unique:users,nip,' . $user->id,
             'name' => 'required|string|max:255',
@@ -47,14 +44,10 @@ class ProfileController extends Controller
         }
 
         $user->save();
-
         return back()->with('status', 'profile-updated');
     }
 
-
-    /**
-     * Delete the user's account.
-     */
+    //fungsi menghapus profile
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [

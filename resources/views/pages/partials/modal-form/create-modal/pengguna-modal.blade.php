@@ -1,9 +1,15 @@
+{{-- Modal Tambah Pengguna --}}
 <x-modal-base title="Tambah Pengguna Baru" max-width="lg" :scrollable="true" {{-- Ini akan otomatis membuka modal jika ada error validasi dari form store --}} :show="$errors->hasAny(['nip', 'name', 'email', 'password', 'peran', 'jabatan'])">
     <x-slot:trigger>
-        <button
-            class="text-white w-full bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-            type="button">
-            Tambah Pengguna Baru
+        <button type="button"
+            class="flex items-center justify-center w-full text-blue-600 hover:bg-blue-50 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#3161f3" viewBox="0 0 24 24">
+                <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"></path>
+                <path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8
+            8-8 8 3.59 8 8-3.59 8-8 8">
+                </path>
+            </svg>
+            Tambah Manual
         </button>
     </x-slot:trigger>
 
@@ -11,6 +17,7 @@
         @csrf
         <div class="grid gap-4 grid-cols-2">
 
+            {{-- NIP --}}
             <div class="col-span-2">
                 <label for="nip_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     NIP
@@ -23,6 +30,7 @@
                 @enderror
             </div>
 
+            {{-- Nama --}}
             <div class="col-span-2">
                 <label for="nama_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Nama
@@ -35,6 +43,7 @@
                 @enderror
             </div>
 
+            {{-- Unit Kerja --}}
             <div class="col-span-2">
                 <label for="unit_kerja_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Unit Kerja
@@ -47,6 +56,7 @@
                 @enderror
             </div>
 
+            {{-- Jabatan --}}
             <div class="col-span-2">
                 <label for="jabatan_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Jabatan
@@ -59,7 +69,7 @@
                 @enderror
             </div>
 
-            <!-- [PERBAIKAN] Field PERAN ditambahkan (WAJIB) -->
+            {{-- Peran Pengguna --}}
             <div class="col-span-2">
                 <label for="peran_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Peran Pengguna
@@ -76,6 +86,7 @@
                 @enderror
             </div>
 
+            {{-- Nomor HP --}}
             <div class="col-span-2">
                 <label for="no_hp_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Nomor HP
@@ -88,6 +99,7 @@
                 @enderror
             </div>
 
+            {{-- Jenis Kelamin --}}
             <div class="col-span-2">
                 <label for="jenis_kelamin_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Jenis Kelamin
@@ -104,6 +116,7 @@
                 @enderror
             </div>
 
+            {{-- Email --}}
             <div class="col-span-2">
                 <label for="email_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Email
@@ -116,6 +129,7 @@
                 @enderror
             </div>
 
+            {{-- Password --}}
             <div class="col-span-2">
                 <label for="password_tambah" class="block mb-2 text-sm font-medium text-gray-900">
                     Password
@@ -128,7 +142,7 @@
                 @enderror
             </div>
 
-            <!-- [PERBAIKAN] Field KONFIRMASI PASSWORD ditambahkan (WAJIB) -->
+            {{-- Konfirmasi Password --}}
             <div class="col-span-2">
                 <label for="password_confirmation" class="block mb-2 text-sm font-medium text-gray-900">
                     Konfirmasi Password

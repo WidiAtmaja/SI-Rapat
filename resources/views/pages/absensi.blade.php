@@ -5,21 +5,17 @@
                 <div class="flex p-7 justify-between items-center">
                     <h1 class="text-xl font-semibold">Absensi</h1>
                     <div class="items-center flex">
+                        {{-- Modal untuk membuat absensi --}}
                         @if (auth()->user()->peran === 'admin')
                             @include('pages.partials.modal-form.create-modal.absensi-modal')
                         @endif
                         @if (auth()->user()->peran === 'pegawai')
                             {{-- Dropdown Filter Kehadiran --}}
-                            {{-- Dropdown Filter Kehadiran --}}
                             <form action="{{ route('absensi.index') }}" method="GET" class="inline-block">
-
-                                {{-- TAMBAHKAN INI: Mengingat filter urutan yang sedang aktif --}}
                                 <input type="hidden" name="urutan" value="{{ request('urutan', 'terbaru') }}">
-
                                 <div class="relative inline-block pr-3">
                                     <select name="kehadiran" onchange="this.form.submit()"
                                         class="appearance-none w-auto max-w-48 pl-3 pr-8 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 cursor-pointer transition">
-
                                         <option value="semua" @selected(request('kehadiran') == 'semua' || !request('kehadiran'))>Semua Kehadiran</option>
                                         <option value="hadir" @selected(request('kehadiran') == 'hadir')>Hadir</option>
                                         <option value="izin" @selected(request('kehadiran') == 'izin')>Izin</option>
@@ -31,22 +27,16 @@
 
                         {{-- Dropdown Filter Urutan (Terbaru/Terlama) --}}
                         <form action="{{ route('absensi.index') }}" method="GET" class="inline-block">
-
-                            {{-- TAMBAHKAN INI: Mengingat filter kehadiran yang sedang aktif --}}
                             <input type="hidden" name="kehadiran" value="{{ request('kehadiran', 'semua') }}">
-
                             <div class="relative inline-block pr-3">
                                 <select name="urutan" onchange="this.form.submit()"
                                     class="appearance-none w-auto max-w-44 pl-3 pr-8 py-2.5 text-sm text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:bg-gray-50 cursor-pointer transition">
                                     <option value="terbaru" @selected(request('urutan') == 'terbaru' || !request('urutan'))>Terbaru</option>
                                     <option value="terlama" @selected(request('urutan') == 'terlama')>Terlama</option>
-
                                 </select>
                             </div>
                         </form>
                     </div>
-
-
                 </div>
 
                 <!--  Card Absensi -->
@@ -58,13 +48,13 @@
                                 <!-- Header -->
                                 <div class="flex justify-between items-center p-4 border-b border-gray-100">
                                     <div>
+                                        <!-- Judul -->
                                         <h1 class="text-lg font-bold mb-2">
                                             {{ $absen->rapat->judul ?? '-' }}
                                         </h1>
                                         <div class="flex items-center text-sm my-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                                 fill="#323232" viewBox="0 0 24 24">
-                                                <!--Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free-->
                                                 <path
                                                     d="m19,4h-2v-2h-2v2h-6v-2h-2v2h-2c-1.1,0-2,.9-2,2v14c0,1.1.9,2,2,2h14c1.1,0,2-.9,2-2V6c0-1.1-.9-2-2-2ZM5,20v-12h14v-2,14s-14,0-14,0Z">
                                                 </path>
@@ -75,6 +65,7 @@
                                                 <path d="M11 15H13V17H11z"></path>
                                                 <path d="M15 15H17V17H15z"></path>
                                             </svg>
+                                            <!-- Tanggal -->
                                             <span
                                                 class="text-gray-600 mx-2">{{ \Carbon\Carbon::parse($absen->rapat->tanggal)->format('d M Y') }}</span>
                                         </div>
@@ -87,6 +78,7 @@
                                                 <path d="M13 6h-2v6c0 .18.05.35.13.5l3 5.2 1.73-1-2.87-4.96V6.01Z">
                                                 </path>
                                             </svg>
+                                            <!-- Waktu -->
                                             <span class="text-gray-600 mx-2">
                                                 {{ \Carbon\Carbon::parse($absen->rapat->waktu_mulai)->translatedFormat('H.i') }}
                                                 -
@@ -104,6 +96,7 @@
                                                     d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6">
                                                 </path>
                                             </svg>
+                                            <!-- Lokasi -->
                                             <span class="text-gray-600 mx-2">{{ $absen->rapat->lokasi }}</span>
                                         </div>
                                     </div>

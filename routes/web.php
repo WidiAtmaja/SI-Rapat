@@ -37,21 +37,18 @@ Route::middleware(['auth'])->group(function () {
 
         // Rapat
         Route::post('/rapat', [RapatController::class, 'store'])->name('rapat.store');
-        // Route::get('/rapat/{rapat}/edit', [RapatController::class, 'edit'])->name('rapat.edit'); // <-- Tambah route edit
-        Route::put('/rapat/{rapat}', [RapatController::class, 'update'])->name('rapat.update'); // <-- {rapat}
-        Route::delete('/rapat/{rapat}', [RapatController::class, 'destroy'])->name('rapat.destroy'); // <-- {rapat}
+        Route::put('/rapat/{rapat}', [RapatController::class, 'update'])->name('rapat.update');
+        Route::delete('/rapat/{rapat}', [RapatController::class, 'destroy'])->name('rapat.destroy');
 
         // Absensi
         Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
-        Route::get('/absensi/{rapat}', [AbsensiController::class, 'show'])->name('absensi.show'); // <-- {rapat}
-        Route::delete('/absensi/{rapat}', [AbsensiController::class, 'destroy'])->name('absensi.destroy'); // <-- {rapat}
+        Route::get('/absensi/{rapat}', [AbsensiController::class, 'show'])->name('absensi.show');
+        Route::delete('/absensi/{rapat}', [AbsensiController::class, 'destroy'])->name('absensi.destroy');
 
         // Notulensi
-        Route::get('/notulensi/create/{rapat}', [NotulenController::class, 'create'])->name('notulensi.create'); // <-- Tambah route create
         Route::post('/notulensi/store', [NotulenController::class, 'store'])->name('notulensi.store');
-        // Route::get('/notulensi/{notulen}/edit', [NotulenController::class, 'edit'])->name('notulensi.edit'); // <-- Tambah route edit
-        Route::put('/notulensi/{notulen}', [NotulenController::class, 'update'])->name('notulensi.update'); // <-- {notulen}
-        Route::delete('/notulensi/{notulen}', [NotulenController::class, 'destroy'])->name('notulensi.destroy'); // <-- {notulen}
+        Route::put('/notulensi/{notulen}', [NotulenController::class, 'update'])->name('notulensi.update');
+        Route::delete('/notulensi/{notulen}', [NotulenController::class, 'destroy'])->name('notulensi.destroy');
     });
 
     // Rapat (Akses Umum)

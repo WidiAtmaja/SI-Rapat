@@ -20,7 +20,6 @@ class Absensi extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke Rapat
     public function rapat()
     {
         return $this->belongsTo(Rapat::class, 'rapat_id');

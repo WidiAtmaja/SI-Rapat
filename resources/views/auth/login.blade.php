@@ -19,7 +19,6 @@
                     </p>
                 </div>
 
-
                 <!-- LOGIN FORM -->
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
@@ -32,7 +31,6 @@
                             placeholder="Masukan Email" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
-
 
                     <!-- Password -->
                     <div class="mt-4">
@@ -54,16 +52,11 @@
                         </label>
                     </div>
 
-
                     <!-- BUTTONS -->
                     <div class="flex flex-col space-y-3">
                         <button type="submit"
                             class="bg-blue-700 hover:bg-blue-500 text-white font-semibold py-2 rounded-md transition">
-                            Login sebagai Admin
-                        </button>
-                        <button type="submit"
-                            class="bg-blue-700 hover:bg-blue-500 text-white font-semibold py-2 rounded-md transition">
-                            Login sebagai Pegawai
+                            Login
                         </button>
                     </div>
 
