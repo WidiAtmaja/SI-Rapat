@@ -8,7 +8,7 @@
                 <!-- LOGO -->
                 <div class="flex justify-center mb-6 space-x-4">
                     <img src="{{ asset('storage/images/logo-kominfo.png') }}" alt="Kominfo" class="w-24 h-24">
-                    <img src="{{ asset('storage/images/logo-undiksha.png') }}" alt="BPS" class="w-24 h-24">
+                    <img src="{{ asset('storage/images/logo-undiksha.png') }}" alt="Undiksha" class="w-24 h-24">
                 </div>
 
                 <!-- WELCOME TEXT -->
@@ -58,15 +58,6 @@
                             class="bg-blue-700 hover:bg-blue-500 text-white font-semibold py-2 rounded-md transition">
                             Login
                         </button>
-                    </div>
-
-                    <!-- FORGOT PASSWORD -->
-                    <div class="mt-4 flex items-center justify-center">
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-sm text-blue-500 hover:underline">
-                                <i class="fas fa-lock mr-1"></i> Lupa password?
-                            </a>
-                        @endif
                     </div>
                 </form>
 

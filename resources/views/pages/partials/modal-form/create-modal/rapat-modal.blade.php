@@ -2,9 +2,9 @@
 <x-modal-base title="Tambah Rapat" max-width="lg" :scrollable="true">
     <x-slot:trigger>
         <button
-            class="mr-4 flex items-center justify-center gap-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            class="flex items-center justify-center gap-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             type="button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ffffff" viewBox="0 0 24 24">
+            <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="#ffffff" viewBox="0 0 24 24">
                 <path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4z"></path>
                 <path
                     d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8">
