@@ -76,7 +76,10 @@
                     class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     <option value="">Pilih PIC</option>
                     @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        {{-- Tambahkan kondisi @if di sini --}}
+                        @if ($user->peran == 'pegawai')
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
