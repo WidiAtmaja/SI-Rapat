@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fileInput.addEventListener('change', function() {
         if (this.files.length > 0) {
             const file = this.files[0];
-            const fileSizeMB = (file.size / 20480 / 20480).toFixed(2);
+            const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
             fileName.textContent = `File terpilih: ${file.name} (${fileSizeMB} MB)`;
             fileName.classList.add('text-green-600');
         } else {
