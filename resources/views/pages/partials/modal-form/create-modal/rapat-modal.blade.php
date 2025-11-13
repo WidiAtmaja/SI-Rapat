@@ -14,7 +14,7 @@
         </button>
     </x-slot:trigger>
 
-    <form id="formTambahRapat" action="{{ route('rapat.store') }}" method="POST">
+    <form id="formTambahRapat" action="{{ route('rapat.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="grid gap-4 grid-cols-2">
             {{-- Judul --}}
@@ -116,6 +116,43 @@
                     <option value="selesai">Selesai</option>
                     <option value="dibatalkan">Dibatalkan</option>
                 </select>
+            </div>
+
+            {{-- File Materi --}}
+            <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Materi</label>
+                <div id="drop-area-materi"
+                    class="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    <svg class="w-8 h-8 mb-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="text-sm text-gray-500">Klik atau seret file ke sini untuk mengunggah
+                    </p>
+                    <input id="materi" name="materi" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                        class="hidden" />
+                </div>
+                <p id="file-name-materi" class="mt-2 text-sm text-gray-600"></p>
+                <p class="mt-1 text-xs text-gray-500">Format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX (Max: 20MB)</p>
+            </div>
+
+            {{-- File Surat --}}
+            <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Surat</label>
+                <div id="drop-area-surat"
+                    class="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    <svg class="w-8 h-8 mb-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="text-sm text-gray-500">Klik atau seret file ke sini untuk mengunggah
+                    </p>
+                    <input id="surat" name="surat" type="file" accept=".pdf,.doc,.docx" class="hidden" />
+                </div>
+                <p id="file-name-surat" class="mt-2 text-sm text-gray-600"></p>
+                <p class="mt-1 text-xs text-gray-500">Format: PDF, DOC, DOCX (Max: 20MB)</p>
             </div>
         </div>
     </form>

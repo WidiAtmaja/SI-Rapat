@@ -19,6 +19,8 @@ class Rapat extends Model
         'waktu_mulai',
         'waktu_selesai',
         'status',
+        'materi',
+        'surat',
     ];
 
     protected static function booted(): void

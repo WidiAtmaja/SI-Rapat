@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class RapatController extends Controller
 {
@@ -33,14 +34,40 @@ class RapatController extends Controller
     //fungsi untuk post data rapat ke database
     public function store(Request $request): RedirectResponse
     {
-        //validasi request sebelum rapat di post ke database
         $validated = $this->validateRapat($request);
 
+        // Definisikan $safeJudul di luar, agar bisa dipakai kedua file
+        $judul = $validated['judul'];
+        $safeJudul = preg_replace('#[\\/?:*!"<>|]#', '-', $judul);
+
         try {
+            // Cek jika ada file materi di request
+            if ($request->hasFile('materi')) {
+                $file = $request->file('materi');
+                $extension = $file->getClientOriginalExtension();
+
+                $newFileName = $safeJudul . "-materi." . $extension;
+                $path = $file->storeAs('materi', $newFileName, 'public');
+                $validated['materi'] = $path;
+            }
+
+            // 🟢 PERBAIKAN: Tambahkan logika untuk file SURAT
+            if ($request->hasFile('surat')) {
+                $file = $request->file('surat');
+                $extension = $file->getClientOriginalExtension();
+
+                // Format nama file untuk surat
+                $newFileName = $safeJudul . "-surat." . $extension;
+                // Simpan di folder 'surat'
+                $path = $file->storeAs('surat', $newFileName, 'public');
+                $validated['surat'] = $path;
+            }
+
             Rapat::create($validated);
+
             return redirect()->route('rapat.index')->with('success', 'Rapat berhasil ditambahkan!');
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Gagal menambahkan rapat. Silakan coba lagi.');
+            return back()->withInput()->with('error', 'Gagal menambahkan rapat: ' . $e->getMessage());
         }
     }
 
@@ -57,11 +84,48 @@ class RapatController extends Controller
         //validasi setiap request sebelum update
         $validated = $this->validateRapat($request);
 
+        // Definisikan $safeJudul di luar, agar bisa dipakai kedua file
+        $judul = $validated['judul'];
+        $safeJudul = preg_replace('#[\\/?:*!"<>|]#', '-', $judul);
+
         try {
+            // == Logika Update Materi (Sudah Benar) ==
+            if ($request->hasFile('materi')) {
+
+                // 1. Hapus file lama (jika ada)
+                if ($rapat->materi && Storage::disk('public')->exists($rapat->materi)) {
+                    Storage::disk('public')->delete($rapat->materi);
+                }
+
+                $file = $request->file('materi');
+                $extension = $file->getClientOriginalExtension();
+
+                $newFileName = $safeJudul . "-materi." . $extension;
+                $path = $file->storeAs('materi', $newFileName, 'public');
+                $validated['materi'] = $path;
+            }
+
+            // 🟢 PERBAIKAN: Tambahkan logika untuk file SURAT
+            if ($request->hasFile('surat')) {
+                // 1. Hapus file surat lama (jika ada)
+                if ($rapat->surat && Storage::disk('public')->exists($rapat->surat)) {
+                    Storage::disk('public')->delete($rapat->surat);
+                }
+
+                // 2. Simpan file surat baru
+                $file = $request->file('surat');
+                $extension = $file->getClientOriginalExtension();
+                $newFileName = $safeJudul . "-surat." . $extension;
+                $path = $file->storeAs('surat', $newFileName, 'public');
+
+                // 3. Update path di array validated
+                $validated['surat'] = $path;
+            }
+
             $rapat->update($validated);
             return redirect()->route('rapat.index')->with('success', 'Rapat berhasil diperbarui!');
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Gagal memperbarui rapat. Silakan coba lagi.');
+            return back()->withInput()->with('error', 'Gagal memperbarui rapat: ' . $e->getMessage());
         }
     }
 
@@ -76,6 +140,17 @@ class RapatController extends Controller
     public function destroy(Rapat $rapat): RedirectResponse
     {
         try {
+            // Hapus file materi
+            if ($rapat->materi && Storage::disk('public')->exists($rapat->materi)) {
+                Storage::disk('public')->delete($rapat->materi);
+            }
+
+            // 🟢 PERBAIKAN: Tambahkan logika hapus file SURAT
+            if ($rapat->surat && Storage::disk('public')->exists($rapat->surat)) {
+                Storage::disk('public')->delete($rapat->surat);
+            }
+            // ========================================================
+
             $rapat->delete();
             return redirect()->route('rapat.index')->with('success', 'Rapat dan data terkait berhasil dihapus!');
         } catch (\Exception $e) {
@@ -98,6 +173,40 @@ class RapatController extends Controller
             'link_zoom' => 'nullable|url|max:255',
             'lokasi' => 'required|string|max:255',
             'status' => 'required|in:terjadwal,sedang berlangsung,selesai,dibatalkan',
+            'materi' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
+            'surat' => 'nullable|file|max:20480|mimes:pdf,doc,docx',
         ]);
+    }
+
+    public function downloadRapat(Rapat $rapat)
+    {
+        if (!$rapat->materi) {
+            return redirect()->back()->with('error', 'Tidak ada materi');
+        }
+
+        $filePathMateri = $rapat->materi;
+
+        if (!Storage::disk('public')->exists($filePathMateri)) {
+            return redirect()->back()->with('error', 'File materi tidak ditemukan di server.');
+        }
+
+        $fileNameMateri = basename($filePathMateri);
+        return Storage::disk('public')->download($filePathMateri, $fileNameMateri);
+    }
+
+    public function downloadSurat(Rapat $rapat)
+    {
+        if (!$rapat->surat) {
+            return redirect()->back()->with('error', 'Tidak ada surat');
+        }
+
+        $filePathSurat = $rapat->surat;
+
+        if (!Storage::disk('public')->exists($filePathSurat)) {
+            return redirect()->back()->with('error', 'File surat tidak ditemukan di server.');
+        }
+
+        $fileNameSurat = basename($filePathSurat);
+        return Storage::disk('public')->download($filePathSurat, $fileNameSurat);
     }
 }

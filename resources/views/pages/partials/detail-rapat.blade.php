@@ -39,12 +39,44 @@
                             <h1 class="text-2xl font-bold text-gray-900">{{ $rapat->judul ?? '-' }}</h1>
                         </div>
 
-                        @if ($rapat->link_zoom)
-                            <a href="{{ $rapat->link_zoom }}" target="_blank"
-                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                                Join Zoom Rapat
-                            </a>
-                        @endif
+                        <div class="flex justify-between gap-2">
+                            @if ($rapat->materi)
+                                {{-- Tampilkan tombol jika file ada --}}
+                                <a href="{{ route('materi.download', $rapat->id) }}" target="_blank"
+                                    class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Unduh Materi
+                                </a>
+                            @else
+                                {{-- Tampilkan div ini jika file TIDAK ada --}}
+                                <div
+                                    class="text-gray-500 bg-gray-200 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Tidak ada Materi
+                                </div>
+                            @endif
+
+                            @if ($rapat->surat)
+                                {{-- Tampilkan tombol jika file ada --}}
+                                <a href="{{ route('surat.download', $rapat->id) }}" target="_blank"
+                                    class="text-white bg-fuchsia-700 hover:bg-fuchsia-800 focus:ring-4 focus:ring-fuchsia-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Unduh Surat
+                                </a>
+                            @else
+                                {{-- Tampilkan div ini jika file TIDAK ada --}}
+                                <div
+                                    class="text-gray-500 bg-gray-200 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Tidak ada Surat
+                                </div>
+                            @endif
+
+                            @if ($rapat->link_zoom)
+                                <a href="{{ $rapat->link_zoom }}" target="_blank"
+                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                    Join Zoom Rapat
+                                </a>
+                            @endif
+                        </div>
+
+
                     </div>
 
                     {{-- Detail Grid --}}

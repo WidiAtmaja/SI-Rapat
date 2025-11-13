@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UserExport;
 use App\Models\Absensi;
 use App\Models\Rapat;
 use App\Models\User;
@@ -225,5 +226,11 @@ class UserController extends Controller
             Log::error('Gagal impor Excel: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan saat mengimpor data. Pastikan format Excel sesuai.');
         }
+    }
+
+    public function exportExcel()
+    {
+        $fileName = 'data_pengguna_' . now()->format('Ymd_His') . '.xlsx';
+        return Excel::download(new UserExport, $fileName);
     }
 }

@@ -9,7 +9,8 @@
     </x-slot:trigger>
 
     {{-- Form Edit Rapat --}}
-    <form id="formEditRapat-{{ $item->id }}" action="{{ route('rapat.update', $item->id) }}" method="POST">
+    <form id="formEditRapat-{{ $item->id }}" action="{{ route('rapat.update', $item->id) }}" method="POST"
+        enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -118,6 +119,58 @@
                     <option value="dibatalkan" {{ old('status', $item->status) == 'dibatalkan' ? 'selected' : '' }}>
                         Dibatalkan</option>
                 </select>
+            </div>
+
+            {{-- File Materi --}}
+            <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Materi</label>
+                <div id="drop-area-materi-{{ $item->id }}"
+                    class="drop-area-materi flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    <svg class="w-8 h-8 mb-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="text-sm text-gray-500">Klik atau seret file baru ke sini (untuk
+                        mengganti)</p>
+                    <input id="materi_file-edit-{{ $item->id }}" name="materi" type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" class="hidden materi-file-edit" />
+                </div>
+
+                <p id="file-name-materi-{{ $item->id }}"
+                    class="file-name-materi-display-edit mt-2 text-sm text-gray-600">
+                    @if ($item->materi)
+                        File saat ini: {{ $item->nama_file_asli ?? basename($item->materi) }}
+                    @else
+                        Tidak ada Materi terlampir.
+                    @endif
+                </p>
+            </div>
+
+            {{-- File Surat --}}
+            <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900">Surat</label>
+                <div id="drop-area-surat-{{ $item->id }}"
+                    class="drop-area-surat flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
+                    <svg class="w-8 h-8 mb-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="text-sm text-gray-500">Klik atau seret file baru ke sini (untuk
+                        mengganti)</p>
+                    <input id="surat_file-edit-{{ $item->id }}" name="surat" type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" class="hidden surat-file-edit" />
+                </div>
+
+                <p id="file-name-surat-{{ $item->id }}"
+                    class="file-name-surat-display-edit mt-2 text-sm text-gray-600">
+                    @if ($item->surat)
+                        File saat ini: {{ $item->nama_file_asli ?? basename($item->surat) }}
+                    @else
+                        Tidak ada Surat terlampir.
+                    @endif
+                </p>
             </div>
         </div>
     </form>

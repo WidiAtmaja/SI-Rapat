@@ -34,6 +34,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/manajemen-pengguna/{user}', [UserController::class, 'update'])->name('user.update');
         Route::delete('/manajemen-pengguna/{user}', [UserController::class, 'destroy'])->name('user.destroy');
         Route::post('/manajemen-pengguna/import-excel', [UserController::class, 'importExcel'])->name('user.import-excel');
+        Route::get('/manajemen-pengguna/export-user', [UserController::class, 'exportExcel'])->name('user.export');
+
 
         // Rapat
         Route::post('/rapat', [RapatController::class, 'store'])->name('rapat.store');
@@ -54,6 +56,8 @@ Route::middleware(['auth'])->group(function () {
     // Rapat (Akses Umum)
     Route::get('/rapat', [RapatController::class, 'index'])->name('rapat.index');
     Route::get('/rapat/{rapat}', [RapatController::class, 'show'])->name('rapat.show'); // <-- {rapat}
+    Route::get('/rapat/download-materi/{rapat}', [RapatController::class, 'downloadRapat'])->name('materi.download');
+    Route::get('/rapat/download-surat/{rapat}', [RapatController::class, 'downloadSurat'])->name('surat.download');
 
     // Search
     Route::get('/search', [SearchController::class, 'search'])->name('global.search');
