@@ -11,7 +11,6 @@ class RapatFactory extends Factory
     {
         return [
             'judul' => $this->faker->sentence(4),
-            'nama_perangkat_daerah' => $this->faker->company(),
             'pic_id' => User::inRandomOrder()->first()->id ?? User::factory(),
             'tanggal' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'waktu_mulai' => $waktuMulai = $this->faker->time('H:i:s'),

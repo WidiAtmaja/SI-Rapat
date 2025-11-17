@@ -34,6 +34,28 @@
                                 <x-input-error :messages="$errors->get('name')" class="mt-1" />
                             </div>
 
+                            {{-- Perangkat Daerah --}}
+                            <div>
+                                <label for="perangkat_daerah_id" class="block mb-2 text-sm font-medium text-gray-900">
+                                    Perangkat Daerah
+                                </label>
+                                <select name="perangkat_daerah_id" id="perangkat_daerah_id"
+                                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+
+                                    <option value="">Pilih Perangkat Daerah</option>
+
+                                    @foreach ($perangkat_daerah as $pd)
+                                        <option value="{{ $pd->id }}"
+                                            {{ old('perangkat_daerah_id', $user->perangkat_daerah_id) == $pd->id ? 'selected' : '' }}>
+                                            {{ $pd->nama_perangkat_daerah }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('perangkat_daerah_id')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             <!-- Unit Kerja -->
                             <div>
                                 <label for="unit_kerja" class="block text-sm font-medium text-gray-700">Unit
@@ -78,6 +100,7 @@
                                 </select>
                                 <x-input-error :messages="$errors->get('jenis_kelamin')" class="mt-1" />
                             </div>
+
                             <!-- Email -->
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -87,13 +110,24 @@
                                 <x-input-error :messages="$errors->get('email')" class="mt-1" />
                             </div>
 
-                            <!-- Passowrd -->
+                            <!-- Password -->
                             <div>
-                                <label for="password" class="block text-sm font-medium text-gray-700">Password Baru
-                                    (opsional)</label>
-                                <input id="password" name="password" type="password" required
+                                <label for="password" class="block text-sm font-medium text-gray-700">
+                                    Password Baru (opsional)
+                                </label>
+                                <input id="password" name="password" type="password" {{-- <== HAPUS 'required' DARI SINI --}}
                                     class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" />
                                 <x-input-error :messages="$errors->get('password')" class="mt-1" />
+                            </div>
+
+                            <!-- Konfirmasi Password -->
+                            <div>
+                                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">
+                                    Konfirmasi Password Baru
+                                </label>
+                                <input id="password_confirmation" name="password_confirmation" type="password"
+                                    class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+                                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1" />
                             </div>
                         </div>
 

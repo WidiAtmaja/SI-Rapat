@@ -11,7 +11,7 @@ class Rapat extends Model
 
     protected $fillable = [
         'judul',
-        'nama_perangkat_daerah',
+        'penyelenggara',
         'pic_id',
         'tanggal',
         'link_zoom',
@@ -46,5 +46,12 @@ class Rapat extends Model
     public function absensis()
     {
         return $this->hasMany(Absensi::class, 'rapat_id');
+    }
+
+    public function perangkatDaerahs()
+    {
+        // 'perangkat_daerah_rapat' adalah nama tabel pivot kamu
+        // 'rapat_id' dan 'perangkat_daerah_id' adalah foreign key-nya
+        return $this->belongsToMany(PerangkatDaerah::class, 'perangkat_daerah_rapat', 'rapat_id', 'perangkat_daerah_id');
     }
 }

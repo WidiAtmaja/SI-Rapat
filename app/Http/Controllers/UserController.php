@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\UserExport;
 use App\Models\Absensi;
+use App\Models\PerangkatDaerah;
 use App\Models\Rapat;
 use App\Models\User;
 use Carbon\Carbon;
@@ -20,6 +21,7 @@ class UserController extends Controller
     //fungsi index pengguna dan pencarian pengguna
     public function index(Request $request)
     {
+        $perangkat_daerah = PerangkatDaerah::all();
         $query = User::query();
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
@@ -35,8 +37,8 @@ class UserController extends Controller
             $query->where('peran', $request->peran);
         }
 
-        $users = $query->get();
-        return view('pages.manajemen-pengguna', compact('users'));
+        $users = $query->with('perangkatDaerah')->get();
+        return view('pages.manajemen-pengguna', compact('users', 'perangkat_daerah'));
     }
 
     public function create()
@@ -52,6 +54,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Password::min(8)],
             'nip' => 'nullable|string|max:50|unique:users',
+            'perangkat_daerah_id' => 'required|exists:perangkat_daerahs,id',
             'unit_kerja' => 'nullable|string|max:255',
             'jabatan' => 'nullable|string|max:255',
             'peran' => 'required|in:admin,pegawai',
@@ -65,6 +68,7 @@ class UserController extends Controller
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'nip' => $validated['nip'],
+                'perangkat_daerah_id' => $validated['perangkat_daerah_id'],
                 'unit_kerja' => $validated['unit_kerja'],
                 'jabatan' => $validated['jabatan'],
                 'peran' => $validated['peran'],
@@ -122,6 +126,7 @@ class UserController extends Controller
                 'max:50',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'perangkat_daerah_id' => 'required|exists:perangkat_daerahs,id',
             'unit_kerja' => 'nullable|string|max:255',
             'jabatan' => 'nullable|string|max:255',
             'peran' => 'required|in:admin,pegawai',
@@ -133,6 +138,7 @@ class UserController extends Controller
             $user->name = $validated['name'];
             $user->email = $validated['email'];
             $user->nip = $validated['nip'];
+            $user->perangkat_daerah_id = $validated['perangkat_daerah_id'];
             $user->unit_kerja = $validated['unit_kerja'];
             $user->jabatan = $validated['jabatan'];
             $user->peran = $validated['peran'];

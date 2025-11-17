@@ -11,29 +11,40 @@ use Illuminate\Support\Facades\Storage;
 
 class NotulenController extends Controller
 {
-
     //fungsi mengirimkan data notulensi views
     public function index(Request $request)
     {
         $user = Auth::user();
         $urutan = $request->query('urutan', 'terbaru');
         $sortDirection = ($urutan == 'terlama') ? 'asc' : 'desc';
+        $query = Notulen::with(['rapat']);
 
-        //queri menampilan notulensi dari rapat
-        $query = Notulen::with(['rapat'])
-            ->when($user->peran !== 'admin', function ($q) use ($user) {
-                $q->whereHas('rapat.absensis', function ($subQ) use ($user) {
-                    $subQ->where('user_id', $user->id);
+        if ($user->peran === 'admin') {
+        } else {
+            $perangkatDaerahId = $user->perangkat_daerah_id;
+
+            if ($perangkatDaerahId) {
+                $query->whereHas('rapat', function ($rapatQuery) use ($perangkatDaerahId) {
+                    $rapatQuery->whereHas('perangkatDaerahs', function ($pdQuery) use ($perangkatDaerahId) {
+                        $pdQuery->where('perangkat_daerahs.id', $perangkatDaerahId);
+                    });
                 });
-            })
-            ->orderBy('created_at', $sortDirection);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        $query->join('rapats', 'notulens.rapat_id', '=', 'rapats.id')
+            ->select('notulens.*')
+            ->orderBy('rapats.tanggal', $sortDirection);
 
         $notulens = $query->get();
+
         if ($user->peran === 'admin') {
             $notulens = $notulens->unique('rapat_id')->values();
         }
 
-        return view('pages.notulensi', compact('notulens'));
+        return view('pages.notulensi', compact('notulens', 'user'));
     }
 
     //fungsi create
@@ -51,20 +62,18 @@ class NotulenController extends Controller
         if (Auth::user()->peran !== 'admin') {
             abort(403, 'Hanya admin yang dapat menambahkan notulensi.');
         }
-
         //validasi setiap request sebelum di post ke database
         $validated = $request->validate([
             'rapat_id' => 'required|exists:rapats,id|unique:notulens,rapat_id',
             'ringkasan' => 'required|string',
             'lampiran_file' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
+            'rekaman' => 'nullable|url|max:255',
         ], [
             'rapat_id.unique' => 'Notulensi untuk rapat ini sudah pernah dibuat.'
         ]);
 
         try {
             $path = null;
-
-            //menjalankan request dan merepalce untuk post file notulensi
             if ($request->hasFile('lampiran_file')) {
                 $rapat = Rapat::findOrFail($validated['rapat_id']);
                 $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $rapat->judul);
@@ -79,6 +88,7 @@ class NotulenController extends Controller
                 'user_id' => Auth::id(),
                 'ringkasan' => $validated['ringkasan'],
                 'lampiran_file' => $path,
+                'rekaman' => $validated['rekaman'],
             ]);
 
             return redirect()->route('notulensi.index')->with('success', 'Notulensi berhasil ditambahkan.');
@@ -91,7 +101,22 @@ class NotulenController extends Controller
     //fungsi menampilkan notulensi untuk pengguna
     public function show(Rapat $rapat)
     {
-        $notulen = Notulen::with('rapat')->where('rapat_id', $rapat->id)->firstOrFail();
+        $user = Auth::user();
+        if ($user->peran !== 'admin') {
+            $perangkatDaerahId = $user->perangkat_daerah_id;
+            $rapat->load('perangkatDaerahs');
+            $isInvited = $rapat->perangkatDaerahs->contains('id', $perangkatDaerahId);
+
+            if (!$isInvited) {
+                abort(403, 'Anda tidak memiliki izin untuk melihat notulensi rapat ini.');
+            }
+        } else {
+            $rapat->load('perangkatDaerahs');
+        }
+
+        $notulen = Notulen::where('rapat_id', $rapat->id)->firstOrFail();
+        $notulen->setRelation('rapat', $rapat);
+
         return view('pages.partials.detail-notulensi', compact('notulen'));
     }
 
@@ -115,9 +140,11 @@ class NotulenController extends Controller
         $validated = $request->validate([
             'ringkasan' => 'required|string',
             'lampiran_file' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
+            'rekaman' => 'nullable|url|max:255',
         ]);
 
         $notulen->ringkasan = $validated['ringkasan'];
+        $notulen->rekaman = $validated['rekaman'];
 
         //jika ada file maka akan diganti atau diperbarui
         if ($request->hasFile('lampiran_file')) {

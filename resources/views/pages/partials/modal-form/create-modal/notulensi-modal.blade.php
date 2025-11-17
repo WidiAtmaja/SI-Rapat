@@ -59,6 +59,16 @@
                     placeholder="Tulis ringkasan rapat di sini..."></textarea>
             </div>
 
+            {{-- Rekaman --}}
+            <div class="col-span-2">
+                <label for="rekaman" class="block mb-2 text-sm font-medium text-gray-900">
+                    Link Rekaman Rapat
+                </label>
+                <input type="url" name="rekaman" id="rekaman"
+                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Masukkan link rekaman rapat">
+            </div>
+
             {{-- File --}}
             <div class="col-span-2">
                 <label class="block mb-2 text-sm font-medium text-gray-900">Lampiran File</label>

@@ -5,17 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Absensi;
 use App\Models\Rapat;
 use App\Models\User;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AbsensiController extends Controller
 {
-
     //fungsi mengirim data absensi
     public function index(Request $request)
     {
@@ -170,7 +167,6 @@ class AbsensiController extends Controller
         ));
     }
 
-
     //fungsi update absensi yang dapat dilakukan pegawai
     public function update(Request $request, Absensi $absensi)
     {
@@ -219,11 +215,13 @@ class AbsensiController extends Controller
 
             // Jika pegawai mengisi "Hadir"
             if ($validated['kehadiran'] === 'hadir') {
-                if ($request->has('tanda_tangan')) {
-                    // Simpan data base64 (jika ada) atau string kosong (jika dikosongkan)
-                    $absensi->tanda_tangan = $request->input('tanda_tangan');
+
+                // 1. Simpan Tanda Tangan (Base64)
+                if ($request->filled('tanda_tangan')) {
+                    $absensi->tanda_tangan = $request->tanda_tangan;
                 }
 
+                // 2. Simpan Foto Wajah
                 if ($request->hasFile('foto_wajah')) {
                     // Hapus file lama jika ada
                     if ($absensi->foto_wajah && Storage::disk('public')->exists($absensi->foto_wajah)) {
@@ -245,7 +243,7 @@ class AbsensiController extends Controller
                     $absensi->foto_zoom = $path;
                 }
             } else {
-                // Jika "Izin" atau "Tidak Hadir", hapus bukti
+                // Jika "Izin" atau "Tidak Hadir", hapus bukti jika ada
                 if ($absensi->foto_wajah && Storage::disk('public')->exists($absensi->foto_wajah)) {
                     Storage::disk('public')->delete($absensi->foto_wajah);
                 }
@@ -274,41 +272,10 @@ class AbsensiController extends Controller
             abort(403, 'Anda tidak memiliki izin untuk menghapus absensi.');
         }
 
+        $rapat->absensis()->delete();
+
         return redirect()
             ->route('absensi.index')
-            ->with('info', 'Fitur hapus absensi telah dinonaktifkan.');
-    }
-
-    //fungsi cetak absensi
-    public function cetakAbsensiPDF(Rapat $rapat)
-    {
-        if (Auth::user()->peran !== 'admin') {
-            abort(403, 'Anda tidak memiliki izin untuk mencetak laporan ini.');
-        }
-
-        $rapat->load([
-            'absensis' => function ($query) {
-                $query->join('users', 'absensis.user_id', '=', 'users.id')
-                    ->orderBy('users.name', 'asc')
-                    ->select('absensis.*');
-            },
-            'absensis.user.perangkatDaerah'
-        ]);
-
-        $absensisDikelompokkan = $rapat->absensis->groupBy(function ($absensi) {
-            return $absensi->user->perangkatDaerah->nama_perangkat_daerah ?? 'Lainnya / Tidak Terdefinisi';
-        });
-
-        $absensisDikelompokkan = $absensisDikelompokkan->sortKeys();
-
-        $data = [
-            'rapat' => $rapat,
-            'absensisDikelompokkan' => $absensisDikelompokkan,
-        ];
-
-        $pdf = Pdf::loadView('pages.pdf.cetak-absensi', $data);
-        $pdf->setPaper('a4', 'landscape');
-        $namaFile = 'daftar-hadir-' . Str::slug($rapat->nama_rapat) . '-' . $rapat->id . '.pdf';
-        return $pdf->stream($namaFile);
+            ->with('success', 'Semua absensi untuk rapat ini berhasil dihapus.');
     }
 }

@@ -25,6 +25,17 @@
                     placeholder="Tulis ringkasan rapat di sini...">{{ old('ringkasan', $item->ringkasan ?? '') }}</textarea>
             </div>
 
+            {{-- Rekaman --}}
+            <div class="col-span-2">
+                <label for="rekaman-{{ $item->id }}" class="block mb-2 text-sm font-medium text-gray-900">
+                    Link Rekaman Rapat <span class="text-red-500">*</span>
+                </label>
+                <input type="url" name="rekaman" id="rekaman-{{ $item->id }}"
+                    value="{{ old('rekaman', $item->rekaman ?? '') }}"
+                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Masukkan link rekaman rapat">
+            </div>
+
             {{-- File --}}
             <div class="col-span-2">
                 <label class="block mb-2 text-sm font-medium text-gray-900">Lampiran File (Opsional)</label>

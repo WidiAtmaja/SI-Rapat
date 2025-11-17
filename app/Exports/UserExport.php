@@ -11,7 +11,7 @@ class UserExport implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return User::select('nip', 'name', 'unit_kerja', 'jabatan', 'no_hp', 'jenis_kelamin', 'email', 'peran')->get();
+        return User::select('nip', 'name', 'perangkat_daerah_id', 'unit_kerja', 'jabatan', 'no_hp', 'jenis_kelamin', 'email', 'peran')->get();
     }
 
     public function headings(): array
@@ -19,6 +19,7 @@ class UserExport implements FromCollection, WithHeadings, WithMapping
         return [
             'NIP',
             'Nama',
+            'Perangkat Daerah',
             'Unit Kerja',
             'Jabatan',
             'No. HP',
@@ -33,6 +34,7 @@ class UserExport implements FromCollection, WithHeadings, WithMapping
         return [
             $user->nip,
             $user->name,
+            $user->perangkatDaerah?->nama_perangkat_daerah,
             $user->unit_kerja,
             $user->jabatan,
             $user->no_hp,

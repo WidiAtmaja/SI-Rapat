@@ -69,6 +69,7 @@
                                     <th class="px-4 py-3 text-left">No</th>
                                     <th class="px-4 py-3 text-left">NIP</th>
                                     <th class="px-4 py-3 text-left">Nama</th>
+                                    <th class="px-4 py-3 text-left">Perangkat Daerah</th>
                                     <th class="px-4 py-3 text-left">Unit Kerja</th>
                                     <th class="px-4 py-3 text-left">Jabatan</th>
                                     <th class="px-4 py-3 text-left">No. HP</th>
@@ -85,6 +86,8 @@
                                         <td class="px-4 py-3">{{ $loop->iteration }}</td>
                                         <td class="px-4 py-3">{{ $pengguna->nip }}</td>
                                         <td class="px-4 py-3">{{ $pengguna->name }}</td>
+                                        <td class="px-4 py-3">{{ $pengguna->perangkatDaerah?->nama_perangkat_daerah }}
+                                        </td>
                                         <td class="px-4 py-3">{{ $pengguna->unit_kerja }}</td>
                                         <td class="px-4 py-3">{{ $pengguna->jabatan }}</td>
                                         <td class="px-4 py-3">{{ $pengguna->no_hp }}</td>
@@ -93,7 +96,7 @@
                                         <td class="px-4 py-3 text-left">
                                             @if ($pengguna->peran == 'admin')
                                                 <span
-                                                    class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                    class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                                                     Admin
                                                 </span>
                                             @else
@@ -107,11 +110,13 @@
                                             <div class="flex justify-start space-x-3">
                                                 <!-- Tombol Hapus -->
                                                 <form action="{{ route('user.destroy', $pengguna) }}" method="POST"
-                                                    onsubmit="return confirm('Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.');">
+                                                    onsubmit="return confirmDelete(event, this)">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit"
-                                                        class="font-medium text-red-600 hover:text-red-800">Hapus</button>
+                                                        class="font-medium text-red-600 hover:text-red-800">
+                                                        Hapus
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>

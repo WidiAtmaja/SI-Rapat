@@ -38,22 +38,39 @@
                             <h1 class="text-2xl font-bold text-gray-900">{{ $notulen->rapat->judul ?? '-' }}</h1>
                         </div>
 
-                        @if ($notulen->lampiran_file)
-                            {{-- Tampilkan tombol jika file ada --}}
-                            <a href="{{ route('notulensi.download', $notulen->id) }}" target="_blank"
-                                class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                Unduh Notulensi
-                            </a>
-                        @else
-                            {{-- Tampilkan div ini jika file TIDAK ada --}}
-                            <div
-                                class="text-gray-500 bg-gray-200 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                Tidak ada dokumen
-                            </div>
-                        @endif
+                        <div class="justify-between flex">
+                            {{-- Tombol Rekaman Rapat --}}
+                            @if ($notulen->rekaman)
+                                <a href="{{ $notulen->rekaman }}" target="_blank"
+                                    class="mr-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Rekaman Rapat
+                                </a>
+                            @else
+                                <div
+                                    class="mr-3 text-gray-500 bg-gray-200 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Tidak ada rekaman
+                                </div>
+                            @endif
+
+                            {{-- Tombol Unduh Notulensi --}}
+                            @if ($notulen->lampiran_file)
+                                <a href="{{ route('notulensi.download', $notulen->id) }}" target="_blank"
+                                    class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Unduh Notulensi
+                                </a>
+                            @else
+                                <div
+                                    class="text-gray-500 bg-gray-200 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                    Tidak ada dokumen
+                                </div>
+                            @endif
+                        </div>
+
+
+
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Tanggal Rapat</p>
                             <p class="text-lg font-semibold">
@@ -70,6 +87,12 @@
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm text-gray-600">Lokasi Rapat</p>
                             <p class="text-lg font-semibold">{{ $notulen->rapat->lokasi }}</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p class="text-sm text-gray-600">Perangkat Daerah</p>
+                            <p class="text-lg font-semibold">
+                                {{ $notulen->rapat->perangkatDaerahs->pluck('nama_perangkat_daerah')->implode(', ') ?: '-' }}
+                            </p>
                         </div>
                     </div>
                 </div>

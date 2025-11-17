@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\NotulenController;
+use App\Http\Controllers\PerangkatDaerahController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RapatController;
 use App\Http\Controllers\SearchController;
@@ -36,6 +37,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/manajemen-pengguna/import-excel', [UserController::class, 'importExcel'])->name('user.import-excel');
         Route::get('/manajemen-pengguna/export-user', [UserController::class, 'exportExcel'])->name('user.export');
 
+        //  Perangkat Daerah
+        Route::get('/perangkat-daerah', [PerangkatDaerahController::class, 'index'])->name('perangkat-daerah.index');
+        Route::post('/perangkat-daerah', [PerangkatDaerahController::class, 'store'])->name('perangkat-daerah.store');
+        Route::put('/perangkat-daerah/{perangkat_daerah}', [PerangkatDaerahController::class, 'update'])->name('perangkat-daerah.update');
+        Route::delete('/perangkat-daerah/{perangkat_daerah}', [PerangkatDaerahController::class, 'destroy'])->name('perangkat-daerah.destroy');
 
         // Rapat
         Route::post('/rapat', [RapatController::class, 'store'])->name('rapat.store');
@@ -46,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/absensi', [AbsensiController::class, 'store'])->name('absensi.store');
         Route::get('/absensi/{rapat}', [AbsensiController::class, 'show'])->name('absensi.show');
         Route::delete('/absensi/{rapat}', [AbsensiController::class, 'destroy'])->name('absensi.destroy');
+        Route::get('/absensi/rapat/{rapat}/cetak-pdf', [AbsensiController::class, 'cetakAbsensiPDF'])->name('absensi.cetak-pdf');
 
         // Notulensi
         Route::post('/notulensi/store', [NotulenController::class, 'store'])->name('notulensi.store');

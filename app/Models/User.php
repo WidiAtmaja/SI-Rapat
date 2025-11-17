@@ -25,6 +25,7 @@ class User extends Authenticatable
         'peran',
         'no_hp',
         'jenis_kelamin',
+        'perangkat_daerah_id',
     ];
 
     /**
@@ -62,5 +63,10 @@ class User extends Authenticatable
     public function absensis()
     {
         return $this->hasMany(Absensi::class, 'user_id');
+    }
+
+    public function perangkatDaerah()
+    {
+        return $this->belongsTo(PerangkatDaerah::class, 'perangkat_daerah_id');
     }
 }

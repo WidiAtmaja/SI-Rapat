@@ -25,18 +25,6 @@
                     placeholder="Masukkan judul rapat" required>
             </div>
 
-            {{-- Nama Perangkat Daerah --}}
-            <div class="col-span-2">
-                <label for="nama_perangkat_daerah-{{ $item->id }}"
-                    class="block mb-2 text-sm font-medium text-gray-900">
-                    Nama Perangkat Daerah
-                </label>
-                <input type="text" name="nama_perangkat_daerah" id="nama_perangkat_daerah-{{ $item->id }}"
-                    value="{{ old('nama_perangkat_daerah', $item->nama_perangkat_daerah) }}"
-                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="Masukkan perangkat daerah" required>
-            </div>
-
             {{-- Tanggal --}}
             <div class="col-span-2 sm:col-span-1">
                 <label for="tanggal-{{ $item->id }}"
@@ -81,6 +69,56 @@
                         </option>
                     @endforeach
                 </select>
+            </div>
+
+            {{-- Cek Box Perangkat Daerah --}}
+            <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900">
+                    Pilih Perangkat Daerah (Bisa pilih lebih dari satu)
+                </label>
+                @php
+                    $selectedPDs = $item->perangkatDaerahs->pluck('id')->toArray();
+                @endphp
+
+                <div class="max-h-40 overflow-y-auto border rounded-lg p-2 space-y-1">
+                    @foreach ($perangkat_daerah as $pd)
+                        <label class="flex items-center">
+                            <input type="checkbox" name="perangkat_daerah_ids[]" value="{{ $pd->id }}"
+                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500"
+                                @if (in_array($pd->id, old('perangkat_daerah_ids', $selectedPDs))) checked @endif>
+                            <span class="ml-2 text-sm text-gray-700">{{ $pd->nama_perangkat_daerah }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Input Kustom (Lainnya) --}}
+            <div class="col-span-2" x-data="{ showCustom: false, customs: [''] }">
+
+                <label class="flex ml-2 items-center gap-1.5 text-sm font-medium text-gray-700 cursor-pointer">
+                    <input type="checkbox" x-model="showCustom"
+                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                    Perangkat Daerah Lainnya (Kustom)
+                </label>
+
+                <div x-show="showCustom" x-cloak class="mt-2 space-y-2">
+                    <template x-for="(item, index) in customs" :key="index">
+                        <input type="text" name="perangkat_daerah_custom[]" x-model="customs[index]"
+                            class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Ketik nama perangkat daerah kustom">
+                    </template>
+                </div>
+            </div>
+
+            {{-- Penyelenggara --}}
+            <div class="col-span-2">
+                <label for="penyelenggara--{{ $item->id }}" class="block mb-2 text-sm font-medium text-gray-900">
+                    Penyelenggara
+                </label>
+                <input type="text" name="penyelenggara" id="penyelenggara{{ $item->id }}"
+                    value="{{ old('penyelenggara', $item->penyelenggara) }}"
+                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Masukkan penyelenggara" required>
             </div>
 
             {{-- Link Zoom --}}

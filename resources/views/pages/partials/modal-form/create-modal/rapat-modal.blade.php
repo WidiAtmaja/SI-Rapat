@@ -27,15 +27,6 @@
                     placeholder="Masukkan judul rapat" required>
             </div>
 
-            {{-- Nama Perangkat Daerah --}}
-            <div class="col-span-2">
-                <label for="nama_perangkat_daerah" class="block mb-2 text-sm font-medium text-gray-900">
-                    Nama Perangkat Daerah
-                </label>
-                <input type="text" name="nama_perangkat_daerah" id="nama_perangkat_daerah"
-                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    placeholder="Masukkan perangkat daerah" required>
-            </div>
 
             {{-- Tanggal --}}
             <div class="col-span-2 sm:col-span-1">
@@ -84,6 +75,50 @@
                 </select>
             </div>
 
+            {{-- Cek Box Perangkat Daerah --}}
+            <div class="col-span-2">
+                <label class="block mb-2 text-sm font-medium text-gray-900">
+                    Pilih Perangkat Daerah (Bisa pilih lebih dari satu)
+                </label>
+                <div class="max-h-40 overflow-y-auto border rounded-lg p-2 space-y-1">
+                    @foreach ($perangkat_daerah as $pd)
+                        <label class="flex items-center">
+                            <input type="checkbox" name="perangkat_daerah_ids[]" value="{{ $pd->id }}"
+                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">{{ $pd->nama_perangkat_daerah }}</span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Input Kustom (Lainnya) --}}
+            <div class="col-span-2" x-data="{ showCustom: false, customs: [''] }">
+
+                <label class="flex ml-2 items-center gap-1.5 text-sm font-medium text-gray-700 cursor-pointer">
+                    <input type="checkbox" x-model="showCustom"
+                        class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                    Perangkat Daerah Lainnya (Kustom)
+                </label>
+
+                <div x-show="showCustom" x-cloak class="mt-2 space-y-2">
+                    <template x-for="(item, index) in customs" :key="index">
+                        <input type="text" name="perangkat_daerah_custom[]" x-model="customs[index]"
+                            class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Ketik nama perangkat daerah kustom">
+                    </template>
+                </div>
+            </div>
+
+            {{-- Penyelenggara --}}
+            <div class="col-span-2">
+                <label for="penyelenggara" class="block mb-2 text-sm font-medium text-gray-900">
+                    Penyelenggara
+                </label>
+                <input type="text" name="penyelenggara" id="penyelenggara"
+                    class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Masukkan penyelenggara" required>
+            </div>
+
             {{-- Link Zoom --}}
             <div class="col-span-2">
                 <label for="link_zoom" class="block mb-2 text-sm font-medium text-gray-900">
@@ -130,8 +165,8 @@
                     </svg>
                     <p class="text-sm text-gray-500">Klik atau seret file ke sini untuk mengunggah
                     </p>
-                    <input id="materi" name="materi" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                        class="hidden" />
+                    <input id="materi" name="materi" type="file"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" class="hidden" />
                 </div>
                 <p id="file-name-materi" class="mt-2 text-sm text-gray-600"></p>
                 <p class="mt-1 text-xs text-gray-500">Format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX (Max: 20MB)</p>

@@ -15,6 +15,7 @@ class Notulen extends Model
         'user_id',
         'ringkasan',
         'lampiran_file',
+        'rekaman',
     ];
 
     protected static function booted(): void
