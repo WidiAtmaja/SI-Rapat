@@ -225,7 +225,6 @@
                                                             <div class="p-4">
                                                                 <div
                                                                     class="border rounded-lg bg-gray-50 overflow-hidden">
-                                                                    {{-- Tampilkan gambar dari Data URI --}}
                                                                     <img src="{{ $absensi->tanda_tangan }}"
                                                                         alt="Tanda Tangan" class="w-full h-auto">
                                                                 </div>

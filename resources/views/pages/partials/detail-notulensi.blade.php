@@ -97,6 +97,7 @@
                     </div>
                 </div>
 
+                {{-- Ringkasan --}}
                 <div class="p-6 border-b border-gray-200">
                     <h1 class="text-lg font-semibold py-4">Ringkasan</h1>
                     <div class="p-7 border rounded-lg bg-gray-50">

@@ -1,107 +1,59 @@
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-
 <x-modal-base id="edit-modal-absensi-{{ $absen->id }}" title="Absensi: {{ $absen->rapat->judul }}" max-width="lg"
     :scrollable="true">
 
-    {{-- TRIGGER --}}
     <x-slot:trigger>
         @php
+            $now = \Carbon\Carbon::now();
+
             $buka = $absen->rapat->datetime_absen_buka
                 ? \Carbon\Carbon::parse($absen->rapat->datetime_absen_buka)
                 : null;
+
             $tutup = $absen->rapat->datetime_absen_tutup
                 ? \Carbon\Carbon::parse($absen->rapat->datetime_absen_tutup)
                 : null;
-            $now = \Carbon\Carbon::now();
-            $isOpen = true;
-            $isNotOpenedYet = false;
-            $isClosed = false;
 
-            if ($buka && $tutup) {
-                if ($now->isBefore($buka)) {
-                    $isOpen = false;
-                    $isNotOpenedYet = true;
-                }
-                if ($now->isAfter($tutup)) {
-                    $isOpen = false;
-                    $isClosed = true;
-                }
+            $isOpen = true;
+            $statusMessage = '';
+            $statusClass = '';
+
+            if ($buka && $now->lessThan($buka)) {
+                $isOpen = false;
+                $statusMessage = 'Belum Dibuka (' . $buka->format('H:i') . ')';
+                $statusClass = 'bg-yellow-500 cursor-not-allowed';
+            } elseif ($tutup && $now->greaterThan($tutup)) {
+                $isOpen = false;
+                $statusMessage = 'Absensi Ditutup';
+                $statusClass = 'bg-red-500 cursor-not-allowed';
             }
         @endphp
 
-        @if ($isClosed)
-            <button class="mr-4 bg-gray-400 text-white rounded-lg px-5 py-2.5 cursor-not-allowed text-sm font-medium">
-                Absensi Ditutup
-            </button>
-        @elseif ($isNotOpenedYet)
-            <button class="mr-4 bg-yellow-500 text-white rounded-lg px-5 py-2.5 cursor-not-allowed text-sm font-medium"
-                title="Dibuka: {{ $buka->format('H:i') }}">
-                Belum Dibuka
+        @if (!$isOpen)
+            <button type="button" disabled
+                class="mr-4 text-white rounded-lg px-5 py-2.5 text-sm font-medium {{ $statusClass }}">
+                {{ $statusMessage }}
             </button>
         @else
-            <button
-                class="mr-4 bg-blue-700 hover:bg-blue-800 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm transition-colors"
-                type="button" @click="open = true">
-                Isi Absensi
+            <button type="button" @click="open = true"
+                class="mr-4 bg-blue-700 hover:bg-blue-800 text-white rounded-lg px-5 py-2.5 text-sm font-medium shadow-sm transition-colors">
+                {{ $absen->kehadiran == 'tidak hadir' ? 'Isi Absensi' : 'Ubah Kehadiran' }}
             </button>
         @endif
     </x-slot:trigger>
 
-    {{-- FORM --}}
+    {{-- FORM Absensi --}}
     <form id="formEditAbsensi-{{ $absen->id }}" action="{{ route('absensi.update', $absen->id) }}" method="POST"
-        enctype="multipart/form-data" x-data="{
+        enctype="multipart/form-data" x-data="absensiForm({
             kehadiran: '{{ old('kehadiran', $absen->kehadiran) }}',
-            signaturePad: null,
-            canvas: null,
-        
-            // Init Logic
-            init() {
-                this.$watch('kehadiran', (val) => {
-                    if (val === 'hadir') this.$nextTick(() => this.initPad());
-                });
-                if (this.kehadiran === 'hadir') this.$nextTick(() => this.initPad());
-            },
-        
-            // Signature Logic
-            initPad() {
-                if (this.signaturePad) return;
-                this.canvas = this.$refs.signatureCanvas;
-                if (this.canvas) {
-                    this.signaturePad = new SignaturePad(this.canvas, { backgroundColor: 'rgb(249, 250, 251)' });
-                    this.resizeCanvas();
-                    @if($absen->tanda_tangan)
-                    this.signaturePad.fromDataURL('{{ $absen->tanda_tangan }}');
-                    @endif
-                }
-            },
-            resizeCanvas() {
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                this.canvas.width = this.canvas.offsetWidth * ratio;
-                this.canvas.height = this.canvas.offsetHeight * ratio;
-                this.canvas.getContext('2d').scale(ratio, ratio);
-            },
-            clearSignature() {
-                if (this.signaturePad) this.signaturePad.clear();
-            },
-        
-            // Submit Logic
-            prepareSubmission() {
-                const form = this.$el;
-                const tteInput = form.querySelector('input[name=tanda_tangan]');
-        
-                if (this.kehadiran === 'hadir' && this.signaturePad && !this.signaturePad.isEmpty()) {
-                    tteInput.value = this.signaturePad.toDataURL('image/png');
-                } else {
-                    tteInput.value = '';
-                }
-                form.submit();
-            }
-        }" @submit.prevent="prepareSubmission">
+            hasOldSignature: {{ $absen->tanda_tangan ? 'true' : 'false' }},
+            showCanvas: {{ $absen->tanda_tangan ? 'false' : 'true' }},
+            photoPreview: '{{ $absen->foto_wajah ? Storage::url($absen->foto_wajah) : '' }}',
+            zoomPreview: '{{ $absen->foto_zoom ? Storage::url($absen->foto_zoom) : '' }}'
+        })" @submit.prevent="prepareSubmission">
         @csrf
         @method('PUT')
 
         <div class="space-y-5">
-
             {{-- ===== INFO RAPAT ===== --}}
             <div class="p-2 rounded-xl border border-gray-100">
                 <div class="flex items-center text-sm my-2">
@@ -131,7 +83,8 @@
                     </svg>
                     <span class="text-gray-600 mx-2">
                         {{ \Carbon\Carbon::parse($absen->rapat->waktu_mulai)->translatedFormat('H.i') }} -
-                        {{ \Carbon\Carbon::parse($absen->rapat->waktu_selesai)->translatedFormat('H.i') }} WITA</span>
+                        {{ \Carbon\Carbon::parse($absen->rapat->waktu_selesai)->translatedFormat('H.i') }}
+                        WITA</span>
                 </div>
                 <div class="flex items-center text-sm my-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#323232"
@@ -146,13 +99,12 @@
                     <span class="text-gray-600 mx-2">{{ $absen->rapat->lokasi }}</span>
                 </div>
 
-                {{-- GARIS PEMISAH --}}
                 <div class="border-t border-gray-200 my-3"></div>
 
                 @if ($buka && $tutup)
                     <div class="flex items-center justify-between text-xs bg-white p-2 rounded border border-gray-200">
                         <span class="text-gray-500">Batas Absensi:</span>
-                        <span class="font-medium text-red-600">{{ $tutup->format('H:i') }} WITA</span>
+                        <span class="font-medium text-red-600"> {{ $absen->waktu_tutup_formatted }} WITA</span>
                     </div>
                 @endif
             </div>
@@ -171,37 +123,30 @@
             {{-- ===== FORM BUKTI (Hanya jika Hadir) ===== --}}
             <div x-show="kehadiran === 'hadir'" x-cloak x-transition.opacity.duration.300ms class="space-y-5">
 
-                {{-- 1. FOTO WAJAH (KAMERA / FILE) --}}
+                {{-- 1. FOTO WAJAH --}}
                 <div x-data="{
                     photoPreview: '{{ $absen->foto_wajah ? Storage::url($absen->foto_wajah) : '' }}',
                     fileName: '',
-                    activeInput: 'none', // 'camera' or 'file'
+                    activeInput: 'none',
                     handleFile(e, type) {
                         const file = e.target.files[0];
                         if (file) {
                             this.fileName = file.name;
                             this.photoPreview = URL.createObjectURL(file);
                             this.activeInput = type;
-                            // Reset input lainnya agar controller menerima input yang benar
                             if (type === 'camera') this.$refs.fileInput.value = '';
                             else this.$refs.camInput.value = '';
                         }
                     }
                 }">
                     <label class="block text-sm font-medium text-gray-700 mb-2">1. Foto Wajah (Selfie)</label>
-
-                    {{-- Hidden Inputs --}}
-                    {{-- Input Kamera (capture=user) --}}
                     <input x-ref="camInput" type="file" accept="image/*" capture="user" class="hidden"
                         @change="handleFile($event, 'camera')" :name="activeInput === 'camera' ? 'foto_wajah' : ''">
-
-                    {{-- Input File Biasa --}}
                     <input x-ref="fileInput" type="file" accept="image/*" class="hidden"
                         @change="handleFile($event, 'file')"
                         :name="activeInput === 'file' || activeInput === 'none' ? 'foto_wajah' : ''">
 
                     <div class="grid grid-cols-2 gap-3">
-                        {{-- Tombol Kamera --}}
                         <button type="button" @click="$refs.camInput.click()"
                             class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition group">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -214,8 +159,6 @@
                             </svg>
                             <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">Ambil Foto</span>
                         </button>
-
-                        {{-- Tombol File --}}
                         <button type="button" @click="$refs.fileInput.click()"
                             class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition group">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -229,7 +172,6 @@
                         </button>
                     </div>
 
-                    {{-- Preview --}}
                     <div x-show="photoPreview" class="mt-3">
                         <p class="text-xs text-gray-500 mb-1">Preview Foto Wajah:</p>
                         <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
@@ -242,7 +184,6 @@
                 {{-- 2. SS ZOOM --}}
                 <div x-data="{ zoomPreview: '{{ $absen->foto_zoom ? Storage::url($absen->foto_zoom) : '' }}', fileName: '' }">
                     <label class="block text-sm font-medium text-gray-700 mb-2">2. Screenshot Zoom</label>
-
                     <label
                         class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
@@ -257,8 +198,6 @@
                         <input type="file" name="foto_zoom" class="hidden" accept="image/*"
                             @change="fileName = $event.target.files[0].name; zoomPreview = URL.createObjectURL($event.target.files[0])" />
                     </label>
-
-                    {{-- Preview Zoom --}}
                     <div x-show="zoomPreview" class="mt-3">
                         <p class="text-xs text-gray-500 mb-1">Preview Zoom:</p>
                         <div
@@ -269,43 +208,79 @@
                     </div>
                 </div>
 
-                {{-- 3. TANDA TANGAN --}}
+                {{-- 3. TANDA TANGAN DIGITAL --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">3. Tanda Tangan Digital</label>
-                    <div
-                        class="w-full h-40 bg-white border-2 border-gray-200 border-dashed rounded-xl overflow-hidden touch-none">
-                        <canvas x-ref="signatureCanvas" class="w-full h-full cursor-crosshair"></canvas>
+
+                    {{-- A. Preview Tanda Tangan Lama (Jika Ada) --}}
+                    @if ($absen->tanda_tangan)
+                        <div class="mb-3 p-2 bg-gray-50 border rounded-lg" x-show="!showCanvas">
+                            <p class="text-xs text-gray-500 mb-1">Tanda Tangan Saat Ini:</p>
+                            <img src="{{ $absen->tanda_tangan }}"
+                                class="h-24 object-contain border border-gray-200 bg-white rounded">
+
+                            <button type="button" @click="showCanvas = true"
+                                class="mt-2 text-xs text-blue-600 hover:underline flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Ubah Tanda Tangan
+                            </button>
+                        </div>
+                    @endif
+
+                    {{-- B. Canvas Tanda Tangan --}}
+                    <div x-show="!hasOldSignature || showCanvas" x-cloak>
+                        <div class="w-full h-40 bg-white border-2 border-gray-200 border-dashed rounded-xl overflow-hidden touch-none relative"
+                            @mouseenter="resizeCanvas" @touchstart.passive="resizeCanvas">
+
+                            <canvas x-ref="signatureCanvas" class="w-full h-full cursor-crosshair"></canvas>
+
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20"
+                                x-show="isCanvasEmpty">
+                                <span class="text-gray-400 text-sm">Goreskan tanda tangan disini</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between mt-1">
+                            <div>
+                                <button type="button" x-show="hasOldSignature"
+                                    @click="showCanvas = false; clearSignature();"
+                                    class="text-xs text-gray-500 hover:text-gray-700">
+                                    Batal Ubah
+                                </button>
+                            </div>
+
+                            <button type="button" @click.prevent="clearSignature"
+                                class="text-xs flex items-center gap-1 text-red-500 hover:text-red-700 font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Bersihkan Canvas
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex justify-end mt-1">
-                        <button type="button" @click.prevent="clearSignature"
-                            class="text-xs flex items-center gap-1 text-red-500 hover:text-red-700 font-medium">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Hapus Tanda Tangan
-                        </button>
-                    </div>
+
                     <input type="hidden" name="tanda_tangan">
                 </div>
             </div>
         </div>
     </form>
 
-    {{-- FOOTER --}}
     <x-slot:footer>
         <div class="flex justify-end gap-2 w-full">
             <button type="button" @click="open = false"
                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 transition">
                 Batal
             </button>
-
             <button type="submit" form="formEditAbsensi-{{ $absen->id }}"
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 shadow-sm transition">
                 Simpan Absensi
             </button>
         </div>
     </x-slot:footer>
-
 </x-modal-base>

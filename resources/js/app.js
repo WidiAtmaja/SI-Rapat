@@ -8,6 +8,7 @@ import './upload-file-notulensi.js';
 import './upload-file-materi.js';
 import './upload-file-surat.js';
 import './validasi-form-rapat.js';
+import './absensi-pegawai.js'
 
 import Alpine from 'alpinejs';
 

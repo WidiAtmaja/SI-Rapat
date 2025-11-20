@@ -23,8 +23,6 @@ class AbsensiController extends Controller
         $kehadiran = $request->query('kehadiran');
         $urutan = $request->query('urutan', 'terbaru');
         $sortDirection = ($urutan == 'terlama') ? 'asc' : 'desc';
-
-        //menjalankan query absensi
         $query = Absensi::with(['user', 'rapat']);
 
         if ($user->peran === 'admin') {
@@ -39,7 +37,6 @@ class AbsensiController extends Controller
                     });
                 });
             } else {
-
                 $query->whereRaw('1 = 0');
             }
 
@@ -48,7 +45,6 @@ class AbsensiController extends Controller
             });
         }
 
-        // Terapkan urutan
         $query->orderBy('rapats.tanggal', $sortDirection);
         $query->join('rapats', 'absensis.rapat_id', '=', 'rapats.id')
             ->select('absensis.*');
@@ -56,18 +52,16 @@ class AbsensiController extends Controller
         $absensis = $query->get();
 
         if ($user->peran === 'admin') {
-            // Terapkan filter unik untuk admin DI SINI
             $absensis = $absensis->unique('rapat_id')->values();
         }
 
         $rapatIds = $absensis->pluck('rapat_id')->unique();
 
         if ($rapatIds->isEmpty()) {
-            // Tambahkan compact('user') untuk view jika perlu info user
             return view('pages.absensi', compact('absensis', 'user'));
         }
 
-        //melihat jumlah kehadiran pegawai
+        //Ambil Statistik Kehadiran
         $statistics = Absensi::whereIn('rapat_id', $rapatIds)
             ->select(
                 'rapat_id',
@@ -80,7 +74,9 @@ class AbsensiController extends Controller
             ->get()
             ->keyBy('rapat_id');
 
+        //TRANSFORMASI DATA (Statistik + Logika Waktu digabung DISINI)
         $absensis->transform(function ($absen) use ($statistics) {
+
             $stats = $statistics->get($absen->rapat_id);
             if ($stats) {
                 $absen->totalPegawai = $stats->totalPegawai;
@@ -88,13 +84,41 @@ class AbsensiController extends Controller
                 $absen->izin = $stats->izin;
                 $absen->tidakHadir = $stats->tidakHadir;
             }
+
+            $now = Carbon::now();
+            $rapat = $absen->rapat;
+
+            // Parse tanggal
+            $buka = $rapat->datetime_absen_buka ? Carbon::parse($rapat->datetime_absen_buka) : null;
+            $tutup = $rapat->datetime_absen_tutup ? Carbon::parse($rapat->datetime_absen_tutup) : null;
+
+            $absen->tutup = $tutup;
+
+            // Hitung Status boolean
+            $absen->isBelumBuka = $buka && $now->lessThan($buka);
+            $absen->isSudahTutup = $tutup && $now->greaterThan($tutup);
+            $absen->is_buka = !$absen->isBelumBuka && !$absen->isSudahTutup;
+
+            // Hitung string sisa waktu
+            $absen->sisa_waktu = ($absen->is_buka && $tutup)
+                ? $tutup->diffForHumans($now, [
+                    'parts' => 2,
+                    'join' => true,
+                    'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
+                ])
+                : '';
+
+            $absen->waktu_buka_formatted = $buka ? $buka->format('d M Y H:i') : '-';
+            $absen->waktu_tutup_formatted = $tutup ? $tutup->format('d M Y H:i') : '-';
+            $absen->waktu_tutup_lengkap = $tutup ? $tutup->format('d M Y H:i') : '-';
+
             return $absen;
         });
 
         return view('pages.absensi', compact('absensis', 'user'));
     }
 
-    //fungsi post absensi ke database
+    // Function store di 
     public function store(Request $request)
     {
         if (Auth::user()->peran !== 'admin') {
@@ -103,32 +127,37 @@ class AbsensiController extends Controller
 
         $validated = $request->validate([
             'rapat_id' => 'required|exists:rapats,id',
+            'datetime_absen_buka' => 'required|date',
+            'datetime_absen_tutup' => 'required|date|after:datetime_absen_buka',
         ]);
 
-        $rapat_id = $validated['rapat_id']; // Simpan ID rapat
+        $rapat_id = $validated['rapat_id'];
 
+        // Cek apakah absensi sudah pernah dibuat
         $exists = Absensi::where('rapat_id', $rapat_id)->exists();
         if ($exists) {
             return back()->with('error', 'Absensi untuk rapat ini sudah pernah dibuat.');
         }
 
         $rapat = Rapat::with('perangkatDaerahs')->find($rapat_id);
-        if (!$rapat) {
-            return back()->with('error', 'Rapat tidak ditemukan.');
-        }
+
+        //UPDATE Waktu Absensi ke tabel Rapat
+        $rapat->update([
+            'datetime_absen_buka' => $validated['datetime_absen_buka'],
+            'datetime_absen_tutup' => $validated['datetime_absen_tutup'],
+        ]);
+
         $invitedPDIds = $rapat->perangkatDaerahs->pluck('id');
-
         if ($invitedPDIds->isEmpty()) {
-            return back()->with('warning', 'Tidak ada Perangkat Daerah yang diundang ke rapat ini. Absensi tidak dibuat.');
+            return back()->with('warning', 'Tidak ada Perangkat Daerah yang diundang. Absensi tidak dibuat.');
         }
 
-        //Ambil ID pegawai HANYA dari Perangkat Daerah yang diundang
         $pegawais = User::where('peran', 'pegawai')
             ->whereIn('perangkat_daerah_id', $invitedPDIds)
             ->pluck('id');
 
         if ($pegawais->isEmpty()) {
-            return back()->with('warning', 'Tidak ada pegawai yang ditemukan di Perangkat Daerah yang diundang. Absensi tidak dibuat.');
+            return back()->with('warning', 'Tidak ada pegawai ditemukan. Absensi tidak dibuat.');
         }
 
         $now = Carbon::now();
@@ -146,7 +175,13 @@ class AbsensiController extends Controller
 
         return redirect()
             ->route('absensi.index')
-            ->with('success', 'Absensi berhasil dibuat untuk ' . $pegawais->count() . ' pegawai terkait.');
+            ->with(
+                'success',
+                'Absensi berhasil dibuka dari ' .
+                    Carbon::parse($validated['datetime_absen_buka'])->format('d M Y H:i') .
+                    ' s/d ' .
+                    Carbon::parse($validated['datetime_absen_tutup'])->format('d M Y H:i')
+            );
     }
 
     //fungsi melihat daftar absensi pegawai
@@ -170,24 +205,20 @@ class AbsensiController extends Controller
         ));
     }
 
-
     //fungsi update absensi yang dapat dilakukan pegawai
     public function update(Request $request, Absensi $absensi)
     {
         $user = Auth::user();
-
-        // Load relasi rapat untuk cek waktu
         $absensi->load('rapat');
         $rapat = $absensi->rapat;
 
-        // --- VALIDASI HAK AKSES DAN WAKTU ---
+        // VALIDASI HAK AKSES DAN WAKTU
         if ($user->peran === 'pegawai') {
-            // 1. Cek kepemilikan absensi
             if ($absensi->user_id !== $user->id) {
                 abort(403, 'Anda tidak memiliki izin untuk mengubah absensi ini.');
             }
 
-            // 2. Cek jam buka/tutup absensi
+            //Cek jam buka/tutup absensi
             $now = Carbon::now();
             $buka = $rapat->datetime_absen_buka ? Carbon::parse($rapat->datetime_absen_buka) : null;
             $tutup = $rapat->datetime_absen_tutup ? Carbon::parse($rapat->datetime_absen_tutup) : null;
@@ -201,7 +232,6 @@ class AbsensiController extends Controller
                     return back()->with('error', 'Absensi untuk rapat ini sudah ditutup.');
                 }
             }
-            // Jika admin tidak mengatur, anggap selalu terbuka
         }
         // --- SELESAI VALIDASI ---
 
@@ -209,43 +239,36 @@ class AbsensiController extends Controller
         $validated = $request->validate([
             'kehadiran' => 'required|in:hadir,izin,tidak hadir',
             'tanda_tangan' => 'nullable|string',
-            'foto_wajah' => 'nullable|image|max:5120', // Max 5MB
-            'foto_zoom' => 'nullable|image|max:5120', // Max 5MB
+            'foto_wajah' => 'nullable|image|max:5120',
+            'foto_zoom' => 'nullable|image|max:5120',
         ]);
 
         try {
-            // Update kehadiran
             $absensi->kehadiran = $validated['kehadiran'];
 
             // Jika pegawai mengisi "Hadir"
             if ($validated['kehadiran'] === 'hadir') {
                 if ($request->has('tanda_tangan')) {
-                    // Simpan data base64 (jika ada) atau string kosong (jika dikosongkan)
                     $absensi->tanda_tangan = $request->input('tanda_tangan');
                 }
 
                 if ($request->hasFile('foto_wajah')) {
-                    // Hapus file lama jika ada
                     if ($absensi->foto_wajah && Storage::disk('public')->exists($absensi->foto_wajah)) {
                         Storage::disk('public')->delete($absensi->foto_wajah);
                     }
-                    // Simpan file baru
                     $path = $request->file('foto_wajah')->store('foto_wajah', 'public');
                     $absensi->foto_wajah = $path;
                 }
 
                 // 3. Simpan Foto Zoom
                 if ($request->hasFile('foto_zoom')) {
-                    // Hapus file lama jika ada
                     if ($absensi->foto_zoom && Storage::disk('public')->exists($absensi->foto_zoom)) {
                         Storage::disk('public')->delete($absensi->foto_zoom);
                     }
-                    // Simpan file baru
                     $path = $request->file('foto_zoom')->store('ss_zoom', 'public');
                     $absensi->foto_zoom = $path;
                 }
             } else {
-                // Jika "Izin" atau "Tidak Hadir", hapus bukti
                 if ($absensi->foto_wajah && Storage::disk('public')->exists($absensi->foto_wajah)) {
                     Storage::disk('public')->delete($absensi->foto_wajah);
                 }
@@ -267,7 +290,7 @@ class AbsensiController extends Controller
         }
     }
 
-    //fungsi hapus absensi dilakukan oleh admin
+    //fungsi hapus absensi dilakukan oleh admin(NON AKTIF)
     public function destroy(Rapat $rapat)
     {
         if (Auth::user()->peran !== 'admin') {

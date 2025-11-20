@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "flowbite": "^3.1.2",
+        "signature_pad": "^5.1.2",
         "sweetalert2": "^11.26.3"
     }
 }

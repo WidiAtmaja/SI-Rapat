@@ -469,26 +469,125 @@ class KalenderRapat {
         document.getElementById('detailRapatModal').classList.remove('hidden');
     }
 
-    //menampilan detial rapat
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Link berhasil disalin ke clipboard!');
+        }).catch(err => {
+            console.error('Gagal menyalin:', err);
+        });
+    }
+
     showRapatDetail(rapatId) {
         const rapat = this.rapatData.find(r => r.id === rapatId);
         if (!rapat) return;
-        
+
+        console.log("Data Rapat:", rapat);
+
         const statusConfig = this.getStatusConfig(rapat.status);
-        
+
+        let namaPerangkatDaerah = '-';
+        if (rapat.perangkat_daerahs && Array.isArray(rapat.perangkat_daerahs) && rapat.perangkat_daerahs.length > 0) {
+            namaPerangkatDaerah = rapat.perangkat_daerahs.map(pd => pd.nama_perangkat_daerah).join(', ');
+        } else if (rapat.nama_perangkat_daerah) {
+            namaPerangkatDaerah = rapat.nama_perangkat_daerah;
+        }
+
+        let materiHtml = '';
+        if (rapat.materi) {
+            const linkMateri = `/rapat/download-materi/${rapat.id}`; 
+            materiHtml = `
+            <div class="bg-green-50 p-4 rounded-lg border border-green-200 mt-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="bg-green-100 p-2.5 rounded-lg flex-shrink-0">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-green-800">Materi Rapat</p>
+                            <p class="text-xs text-green-600 truncate">File tersedia untuk diunduh</p>
+                        </div>
+                    </div>
+                    <a href="${linkMateri}" class="flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-green-800 text-sm font-medium rounded-lg transition-colors shadow-sm whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Unduh Materi
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        let suratHtml = '';
+        if (rapat.surat) {
+            const linkSurat = `/rapat/download-surat/${rapat.id}`;
+            suratHtml = `
+            <div class="bg-purple-50 p-4 rounded-lg border border-purple-200 mt-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="bg-purple-100 p-2.5 rounded-lg flex-shrink-0">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-purple-800">Surat Rapat</p>
+                            <p class="text-xs text-purple-600 truncate">File tersedia untuk diunduh</p>
+                        </div>
+                    </div>
+                    <a href="${linkSurat}" class="flex-shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-purple-800 text-sm font-medium rounded-lg transition-colors shadow-sm whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Unduh Surat
+                    </a>
+                </div>
+            </div>`;
+        }
+
+        let zoomHtml = '';
+        if (rapat.link_zoom) {
+            zoomHtml = `
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-blue-100 p-2 rounded-lg">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-blue-800">Link Zoom Meeting</p>
+                            <p class="text-xs text-blue-600">Klik tombol salin atau bergabung</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 bg-white border border-blue-200 rounded-lg p-1 pl-3">
+                        <input type="text" value="${rapat.link_zoom}" readonly class="flex-1 text-sm text-gray-600 focus:outline-none bg-transparent truncate">
+                        <button onclick="kalenderRapat.copyToClipboard('${rapat.link_zoom}')" 
+                                class="p-2 hover:bg-gray-100 text-gray-500 hover:text-blue-600 rounded-md transition-colors" 
+                                title="Salin Link">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
         let html = `
             <div class="space-y-6">
-                <!-- Header -->
                 <div class="border-l-4 ${statusConfig.borderColor} pl-4">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">${rapat.judul}</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2 break-words">${rapat.judul}</h3>
                     <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold ${statusConfig.bgColor} ${statusConfig.textColor}">
                         ${rapat.status.charAt(0).toUpperCase() + rapat.status.slice(1)}
                     </span>
                 </div>
 
-                <!-- Details Grid -->
                 <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Tanggal & Waktu -->
+                    
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -501,7 +600,6 @@ class KalenderRapat {
                         </div>
                     </div>
 
-                    <!-- Waktu -->
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -514,7 +612,6 @@ class KalenderRapat {
                         </div>
                     </div>
 
-                    <!-- Lokasi -->
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -528,7 +625,6 @@ class KalenderRapat {
                         </div>
                     </div>
 
-                    <!-- Perangkat Daerah -->
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -536,52 +632,44 @@ class KalenderRapat {
                             </svg>
                             <div>
                                 <p class="text-sm font-semibold text-gray-700">Perangkat Daerah</p>
-                                <p class="text-gray-900">${rapat.nama_perangkat_daerah}</p>
+                                <p class="text-gray-900">${namaPerangkatDaerah}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-700">Person In Charge (PIC)</p>
+                                <p class="text-gray-900">${rapat.pic ? rapat.pic.name : 'Tidak ada'}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- PIC -->
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-gray-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-semibold text-gray-700">Person In Charge (PIC)</p>
-                            <p class="text-gray-900">${rapat.pic ? rapat.pic.name : 'Tidak ada'}</p>
-                        </div>
-                    </div>
-                </div>
+                ${materiHtml}
+                ${suratHtml}
+                ${zoomHtml}
 
-                ${rapat.link_zoom ? `
-                <!-- Link Zoom -->
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold text-blue-700 mb-1">Link Zoom Meeting</p>
-                            <a href="${rapat.link_zoom}" target="_blank" class="text-blue-600 hover:text-blue-800 underline break-all">
-                                ${rapat.link_zoom}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
-
-                <!-- Action Buttons -->
                 <div class="flex gap-3 pt-4 border-t border-gray-200">
-                    <a href="${rapat.link_zoom}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors text-center">
-                        Bergabung
-                    </a>
-                  
+                    ${rapat.link_zoom ? `
+                        <a href="${rapat.link_zoom}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors text-center flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Bergabung Sekarang
+                        </a>
+                    ` : ''}
+                    <button onclick="kalenderRapat.closeModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg transition-colors text-center">
+                        Tutup
+                    </button>
                 </div>
             </div>
         `;
-        
+
         document.getElementById('modalContent').innerHTML = html;
         document.getElementById('detailRapatModal').classList.remove('hidden');
     }

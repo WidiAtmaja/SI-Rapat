@@ -99,7 +99,7 @@
                         </div>
                     </div>
 
-                    {{-- Tambahan Detail --}}
+                    {{-- Detail --}}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <p class="text-sm mb-2 text-gray-600">Perangkat Daerah</p>

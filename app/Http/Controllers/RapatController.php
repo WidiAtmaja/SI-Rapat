@@ -55,7 +55,7 @@ class RapatController extends Controller
     //fungsi untuk post data rapat ke database
     public function store(Request $request): RedirectResponse
     {
-        // 1. Validasi request
+        //Validasi request
         $validated = $this->validateRapat($request);
 
         $judul = $validated['judul'];
@@ -63,36 +63,35 @@ class RapatController extends Controller
 
         DB::beginTransaction();
         try {
-            // 2. Pisahkan data Rapat dari data relasi
+            //Pisahkan data Rapat dari data relasi
             $rapatData = collect($validated)->except(['perangkat_daerah_ids', 'perangkat_daerah_custom'])->toArray();
 
-            // 3. Handle file Materi
+            //Handle file Materi
             if ($request->hasFile('materi')) {
                 $file = $request->file('materi');
                 $extension = $file->getClientOriginalExtension();
                 $newFileName = $safeJudul . "-materi." . $extension;
                 $path = $file->storeAs('materi', $newFileName, 'public');
-                $rapatData['materi'] = $path; // Masukkan path ke data Rapat
+                $rapatData['materi'] = $path;
             }
 
-            // 4. Handle file Surat
+            //Handle file Surat
             if ($request->hasFile('surat')) {
                 $file = $request->file('surat');
                 $extension = $file->getClientOriginalExtension();
                 $newFileName = $safeJudul . "-surat." . $extension;
                 $path = $file->storeAs('surat', $newFileName, 'public');
-                $rapatData['surat'] = $path; // Masukkan path ke data Rapat
+                $rapatData['surat'] = $path;
             }
 
             $rapat = Rapat::create($rapatData);
 
             $allPerangkatDaerahIds = $request->input('perangkat_daerah_ids', []);
 
-            // Handle Kustom
+            // Handle PD Kustom
             if ($request->has('perangkat_daerah_custom')) {
                 foreach ($request->perangkat_daerah_custom as $namaCustom) {
                     if (!empty($namaCustom)) {
-                        // Cari, jika tidak ada, buat baru
                         $perangkatDaerah = PerangkatDaerah::firstOrCreate(
                             ['nama_perangkat_daerah' => $namaCustom]
                         );
@@ -122,7 +121,6 @@ class RapatController extends Controller
     //fungsi update rapat oleh admin
     public function update(Request $request, Rapat $rapat): RedirectResponse
     {
-        //validasi setiap request sebelum update
         $validated = $this->validateRapat($request);
 
         // Definisikan $safeJudul di luar, agar bisa dipakai kedua file
@@ -150,11 +148,11 @@ class RapatController extends Controller
 
             //Tambahkan logika untuk file SURAT
             if ($request->hasFile('surat')) {
-                // 1. Hapus file surat lama (jika ada)
+                //Hapus file surat lama (jika ada)
                 if ($rapat->surat && Storage::disk('public')->exists($rapat->surat)) {
                     Storage::disk('public')->delete($rapat->surat);
                 }
-                // 2. Simpan file surat baru
+                //Simpan file surat baru
                 $file = $request->file('surat');
                 $extension = $file->getClientOriginalExtension();
                 $newFileName = $safeJudul . "-surat." . $extension;
@@ -163,13 +161,12 @@ class RapatController extends Controller
                 $rapatData['surat'] = $path;
             }
 
-            // 2. Update data Rapat (tabel 'rapats')
             $rapat->update($rapatData);
 
-            // 3. Proses Perangkat Daerah (SAMA SEPERTI STORE)
+            //Proses Perangkat Daerah (SAMA SEPERTI STORE)
             $allPerangkatDaerahIds = $request->input('perangkat_daerah_ids', []);
 
-            // Handle Kustom
+            // Handle PD Kustom
             if ($request->has('perangkat_daerah_custom')) {
                 foreach ($request->perangkat_daerah_custom as $namaCustom) {
                     if (!empty($namaCustom)) {
@@ -208,7 +205,7 @@ class RapatController extends Controller
                 Storage::disk('public')->delete($rapat->materi);
             }
 
-            //Tambahkan logika hapus file SURAT
+            //Hapus file SURAT
             if ($rapat->surat && Storage::disk('public')->exists($rapat->surat)) {
                 Storage::disk('public')->delete($rapat->surat);
             }
@@ -237,11 +234,7 @@ class RapatController extends Controller
             'materi' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx',
             'surat' => 'nullable|file|max:20480|mimes:pdf,doc,docx',
 
-            // --- TAMBAHAN VALIDASI WAKTU ABSEN ---
-            'datetime_absen_buka' => 'nullable|date',
-            'datetime_absen_tutup' => 'nullable|date|after_or_equal:datetime_absen_buka',
-
-            // Validasi Baru
+            // Validasi PD
             'perangkat_daerah_ids' => 'nullable|array',
             'perangkat_daerah_ids.*' => 'exists:perangkat_daerahs,id',
             'perangkat_daerah_custom' => 'nullable|array',

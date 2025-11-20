@@ -27,7 +27,6 @@
                     class="bg-gray-50 border border-gray-300 placeholder-gray-400 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                     <option value="">Pilih Rapat</option>
                     @php
-                        // Ambil rapat yang belum punya absensi
                         $rapatTersedia = \App\Models\Rapat::whereDoesntHave('absensis')
                             ->orderBy('tanggal', 'desc')
                             ->get();
@@ -47,6 +46,24 @@
                         Semua rapat sudah memiliki absensi atau belum ada rapat yang dibuat.
                     </p>
                 @endif
+            </div>
+
+            {{-- Input Waktu Buka --}}
+            <div>
+                <label for="datetime_absen_buka" class="block mb-2 text-sm font-medium text-gray-900">
+                    Waktu Buka Absen <span class="text-red-500">*</span>
+                </label>
+                <input type="datetime-local" name="datetime_absen_buka" id="datetime_absen_buka" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+            </div>
+
+            {{-- Input Waktu Tutup --}}
+            <div>
+                <label for="datetime_absen_tutup" class="block mb-2 text-sm font-medium text-gray-900">
+                    Waktu Tutup Absen <span class="text-red-500">*</span>
+                </label>
+                <input type="datetime-local" name="datetime_absen_tutup" id="datetime_absen_tutup" required
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
             </div>
         </div>
 

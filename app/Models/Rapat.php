@@ -21,6 +21,8 @@ class Rapat extends Model
         'status',
         'materi',
         'surat',
+        'datetime_absen_buka',
+        'datetime_absen_tutup',
     ];
 
     protected static function booted(): void
@@ -50,7 +52,7 @@ class Rapat extends Model
 
     public function perangkatDaerahs()
     {
-        // 'perangkat_daerah_rapat' adalah nama tabel pivot kamu
+        // 'perangkat_daerah_rapat' adalah nama tabel pivot 
         // 'rapat_id' dan 'perangkat_daerah_id' adalah foreign key-nya
         return $this->belongsToMany(PerangkatDaerah::class, 'perangkat_daerah_rapat', 'rapat_id', 'perangkat_daerah_id');
     }

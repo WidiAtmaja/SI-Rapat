@@ -17,13 +17,13 @@ class ProfileController extends Controller
     //fungsi edit profil
     public function edit(Request $request): View
     {
-        // 2. AMBIL DATA PERANGKAT DAERAH
+        //AMBIL DATA PERANGKAT DAERAH
         $perangkat_daerah = PerangkatDaerah::orderBy('nama_perangkat_daerah', 'asc')->get();
 
-        // 3. KIRIM DATANYA KE VIEW
+        //KIRIM DATANYA KE VIEW
         return view('profile.edit', [
             'user' => $request->user(),
-            'perangkat_daerah' => $perangkat_daerah, // <-- 4. TAMBAHKAN INI
+            'perangkat_daerah' => $perangkat_daerah,
         ]);
     }
 

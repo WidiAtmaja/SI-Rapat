@@ -142,27 +142,67 @@
                                     <!-- Body -->
                                     <div class="p-4 flex justify-between items-center">
                                         <div>
-                                            <p class="text-sm text-gray-600">
-                                                Dibuat:
-                                                {{ $absen->created_at->timezone('Asia/Makassar')->format('d M Y H:i') }}
-                                                WITA
-                                            </p>
+                                            <div>
+                                                <div
+                                                    class="rounded-lg text-sm  
+                                                        {{ $absen->isSudahTutup ? ' text-red-700' : ($absen->isBelumBuka ? ' text-yellow-700' : ' text-blue-700') }}">
+                                                    <div class="flex items-center gap-2">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+
+                                                        @if ($absen->isBelumBuka)
+                                                            {{-- KASUS 1: Belum Waktunya --}}
+                                                            <div>
+                                                                <span class="font-semibold">Absensi Belum Dibuka.</span>
+                                                                <span class="text-xs mt-1 block">Buka pada:
+                                                                    {{ $absen->waktu_buka_formatted }}</span>
+                                                            </div>
+                                                        @elseif($absen->isSudahTutup)
+                                                            {{-- KASUS 2: Sudah Lewat --}}
+                                                            <div>
+                                                                <span class="font-semibold">Absensi Ditutup.</span>
+                                                                <span class="text-xs mt-1 block">Batas waktu:
+                                                                    {{ $absen->waktu_tutup_lengkap }}</span>
+                                                            </div>
+                                                        @else
+                                                            {{-- KASUS 3: Sedang Berlangsung --}}
+                                                            <div>
+                                                                <span class="font-semibold">Absensi Sedang
+                                                                    Berlangsung.</span>
+                                                                @if ($absen->tutup)
+                                                                    <span class="text-xs mt-1 block">
+                                                                        Batas akhir:
+                                                                        {{ $absen->waktu_tutup_formatted }}
+                                                                        ({{ str_replace('from now', 'lagi', $absen->sisa_waktu) }})
+                                                                    </span>
+                                                                @else
+                                                                    <span class="text-xs mt-1 block">
+                                                                        Batas akhir: - (Tidak dibatasi)
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-xs text-gray-500 mt-3 ml-6">
+                                                            Dibuat:
+                                                            {{ $absen->created_at->timezone('Asia/Makassar')->format('d M Y H:i') }}
+                                                            WITA
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+
                                         <div class="flex gap-2">
                                             <a href="{{ route('absensi.show', $absen->rapat_id) }}"
                                                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                                                 Detail Absensi
                                             </a>
-                                            {{-- <form action="{{ route('absensi.destroy', $absen->rapat_id) }}"
-                                                method="POST" style="display: inline;"
-                                                onsubmit="confirmDelete(event, this)">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                                    Hapus
-                                                </button>
-                                            </form> --}}
                                         </div>
                                     </div>
                                 @endif
@@ -171,27 +211,58 @@
                                     <!-- Body -->
                                     <div class="p-4 flex justify-between items-center">
                                         <div>
-                                            <p class="text-sm text-gray-600">
-                                                Status Kehadiran:
-                                                @if ($absen->kehadiran == 'hadir')
-                                                    <p1 class="inline-block text-green-800 font-semibold">
-                                                        Hadir
-                                                        </span>
-                                                    @elseif($absen->kehadiran == 'izin')
-                                                        <span class="inline-block text-yellow-800 font-semibold">
-                                                            Izin
-                                                        </span>
+                                            <div
+                                                class="rounded-lg text-sm  
+                                                    {{ $absen->isSudahTutup ? ' text-red-700' : ($absen->isBelumBuka ? ' text-yellow-700' : ' text-blue-700') }}">
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+
+                                                    @if ($absen->isBelumBuka)
+                                                        {{-- KASUS 1: Belum Waktunya --}}
+                                                        <div>
+                                                            <span class="font-semibold">Absensi Belum Dibuka.</span>
+                                                            <span class="text-xs mt-1 block">Buka pada:
+                                                                {{ $absen->waktu_buka_formatted }}</span>
+                                                        </div>
+                                                    @elseif($absen->isSudahTutup)
+                                                        {{-- KASUS 2: Sudah Lewat --}}
+                                                        <div>
+                                                            <span class="font-semibold">Absensi Ditutup.</span>
+                                                            <span class="text-xs mt-1 block">Batas waktu:
+                                                                {{ $absen->waktu_tutup_lengkap }}</span>
+                                                        </div>
                                                     @else
-                                                        <span class="inline-block text-red-800 font-semibold">
-                                                            Tidak Hadir
-                                                        </span>
+                                                        {{-- KASUS 3: Sedang Berlangsung --}}
+                                                        <div>
+                                                            <span class="font-semibold">Absensi Sedang
+                                                                Berlangsung.</span>
+                                                            @if ($absen->tutup)
+                                                                <span class="text-xs mt-1 block">
+                                                                    Batas akhir:
+                                                                    {{ $absen->waktu_tutup_formatted }}
+                                                                    ({{ str_replace('from now', 'lagi', $absen->sisa_waktu) }})
+                                                                </span>
+                                                            @else
+                                                                <span class="text-xs mt-1 block">
+                                                                    Batas akhir: - (Tidak dibatasi)
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                @if ($absen->updated_at != $absen->created_at)
+                                                    <p class="text-xs text-gray-500 mt-3 ml-6">
+                                                        Terakhir diupdate:
+                                                        {{ $absen->updated_at->format('d M Y H:i') }}
+                                                    </p>
                                                 @endif
-                                            </p>
-                                            @if ($absen->updated_at != $absen->created_at)
-                                                <p class="text-xs text-gray-500 mt-1">
-                                                    Terakhir diupdate: {{ $absen->updated_at->format('d M Y H:i') }}
-                                                </p>
-                                            @endif
+                                            </div>
                                         </div>
                                         @include('pages.partials.modal-form.edit-modal.absensi-modal')
                                     </div>

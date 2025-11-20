@@ -42,6 +42,7 @@ class PerangkatDaerahController extends Controller
             abort(403, 'Hanya admin yang dapat menambah Perangkat Daerah.');
         }
 
+        // store ke database
         try {
             $validated = $request->validate([
                 'nama_perangkat_daerah' => 'required|string|max:255',
