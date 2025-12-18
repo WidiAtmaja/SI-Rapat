@@ -36,6 +36,17 @@
                                     class="block w-64 rounded-lg border border-gray-300 bg-gray-50 p-2.5 pl-9 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                                     value="{{ request('search') }}" placeholder="Cari Pengguna" />
                             </form>
+
+                            <a href="{{ route('user.download-template') }}" 
+                                class="flex items-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm px-4 py-2.5 transition shadow-sm"
+                                title="Unduh Template Excel">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span class="ml-2 hidden md:inline">Template</span>
+                            </a>
                         </div>
 
                         <!-- Kanan: Tombol Aksi -->

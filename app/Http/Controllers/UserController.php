@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Maatwebsite\Excel\Facades\Excel;
@@ -238,5 +239,18 @@ class UserController extends Controller
     {
         $fileName = 'data_pengguna_' . now()->format('Ymd_His') . '.xlsx';
         return Excel::download(new UserExport, $fileName);
+    }
+
+    public function downloadTemplate()
+    {
+
+        $fileName = 'template/Template-Pengguna.xlsx';
+        $disk = 'public';
+    
+        if (Storage::disk($disk)->exists($fileName)) {
+            return Storage::disk($disk)->download($fileName, 'Template-Import-Pengguna.xlsx');
+        }
+        
+        return back()->with('error', 'File template tidak ditemukan. Pastikan file ada di storage/app/public/template/Template-Pengguna.xlsx');
     }
 }

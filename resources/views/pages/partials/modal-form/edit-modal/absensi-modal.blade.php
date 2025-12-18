@@ -123,61 +123,57 @@
             {{-- ===== FORM BUKTI (Hanya jika Hadir) ===== --}}
             <div x-show="kehadiran === 'hadir'" x-cloak x-transition.opacity.duration.300ms class="space-y-5">
 
-                {{-- 1. FOTO WAJAH --}}
-                <div x-data="{
-                    photoPreview: '{{ $absen->foto_wajah ? Storage::url($absen->foto_wajah) : '' }}',
-                    fileName: '',
-                    activeInput: 'none',
-                    handleFile(e, type) {
-                        const file = e.target.files[0];
-                        if (file) {
-                            this.fileName = file.name;
-                            this.photoPreview = URL.createObjectURL(file);
-                            this.activeInput = type;
-                            if (type === 'camera') this.$refs.fileInput.value = '';
-                            else this.$refs.camInput.value = '';
-                        }
-                    }
-                }">
+             {{-- Bagian Foto Wajah (Selfie) --}}
+                <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">1. Foto Wajah (Selfie)</label>
-                    <input x-ref="camInput" type="file" accept="image/*" capture="user" class="hidden"
-                        @change="handleFile($event, 'camera')" :name="activeInput === 'camera' ? 'foto_wajah' : ''">
-                    <input x-ref="fileInput" type="file" accept="image/*" class="hidden"
-                        @change="handleFile($event, 'file')"
-                        :name="activeInput === 'file' || activeInput === 'none' ? 'foto_wajah' : ''">
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" @click="$refs.camInput.click()"
+                    <div class="grid grid-cols-2 gap-3" x-show="!streamActive && !photoPreview">
+                        <button type="button" @click="startWebcam"
                             class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition group">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="w-6 h-6 text-gray-400 group-hover:text-blue-600 mb-1" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400 group-hover:text-blue-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">Ambil Foto</span>
+                            <span class="text-xs font-medium text-gray-600 group-hover:text-blue-700">Buka Kamera</span>
                         </button>
+
                         <button type="button" @click="$refs.fileInput.click()"
                             class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition group">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="w-6 h-6 text-gray-400 group-hover:text-purple-600 mb-1" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400 group-hover:text-purple-600 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span class="text-xs font-medium text-gray-600 group-hover:text-purple-700">Pilih
-                                File</span>
+                            <span class="text-xs font-medium text-gray-600 group-hover:text-purple-700">Pilih Gallery</span>
                         </button>
                     </div>
 
-                    <div x-show="photoPreview" class="mt-3">
-                        <p class="text-xs text-gray-500 mb-1">Preview Foto Wajah:</p>
-                        <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    <div x-show="streamActive" class="relative bg-black rounded-xl overflow-hidden" x-cloak>
+                        <video x-ref="video" autoplay playsinline class="w-full h-48 object-cover"></video>
+                        <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
+                            <button type="button" @click="takeSnapshot" class="bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <circle cx="12" cy="12" r="9" stroke-width="2"/>
+                                    <circle cx="12" cy="12" r="3" stroke-width="2"/>
+                                </svg>
+                            </button>
+                            <button type="button" @click="stopWebcam" class="bg-red-600 text-white p-2 rounded-full shadow-lg hover:bg-red-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <input x-ref="fileInput" type="file" name="foto_wajah" accept="image/*" class="hidden" @change="handleFile($event, 'file', 'foto_wajah')">
+                    <canvas x-ref="canvas" class="hidden"></canvas>
+
+                    <div x-show="photoPreview" class="mt-3" x-cloak>
+                        <div class="flex items-center justify-between mb-1">
+                            <p class="text-xs text-gray-500">Preview Foto:</p>
+                            <button type="button" @click="resetPhoto" class="text-xs text-red-500 hover:underline">Ambil Ulang</button>
+                        </div>
+                        <div class="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
                             <img :src="photoPreview" class="w-full h-full object-cover">
                         </div>
-                        <p x-text="fileName" class="text-xs text-gray-500 mt-1 truncate"></p>
                     </div>
                 </div>
 

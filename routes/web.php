@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/manajemen-pengguna/{user}', [UserController::class, 'destroy'])->name('user.destroy');
         Route::post('/manajemen-pengguna/import-excel', [UserController::class, 'importExcel'])->name('user.import-excel');
         Route::get('/manajemen-pengguna/export-user', [UserController::class, 'exportExcel'])->name('user.export');
+        Route::get('/manajemen-pengguna/download-template', [UserController::class, 'downloadTemplate'])->name('user.download-template');
 
         //  Perangkat Daerah
         Route::get('/perangkat-daerah', [PerangkatDaerahController::class, 'index'])->name('perangkat-daerah.index');
